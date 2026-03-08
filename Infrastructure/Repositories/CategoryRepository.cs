@@ -15,10 +15,17 @@ public class CategoryRepository : ICategoryRepository
     }
 
     public async Task<IReadOnlyList<Category>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        await _context.Categories.OrderBy(c => c.Name).ToListAsync(cancellationToken);
+        await _context.Categories
+            .AsNoTracking()
+            .Include(c => c.SubCategories)
+            .OrderBy(c => c.Name)
+            .ToListAsync(cancellationToken);
 
     public async Task<Category?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        await _context.Categories.FindAsync(new object[] { id }, cancellationToken);
+        await _context.Categories
+            .AsNoTracking()
+            .Include(c => c.SubCategories)
+            .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
 
     public async Task AddAsync(Category entity, CancellationToken cancellationToken = default) =>
         await _context.Categories.AddAsync(entity, cancellationToken);

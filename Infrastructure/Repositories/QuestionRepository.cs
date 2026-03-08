@@ -14,11 +14,14 @@ public class QuestionRepository : IQuestionRepository
         _context = context;
     }
 
+    public async Task<IReadOnlyList<Question>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        await _context.Questions.AsNoTracking().Include(q => q.Category).Include(q => q.SubCategory).OrderByDescending(q => q.CreatedAt).ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<Question>> GetBySubCategoryIdAsync(int subCategoryId, CancellationToken cancellationToken = default) =>
-        await _context.Questions.Where(q => q.SubCategoryId == subCategoryId).OrderBy(q => q.CreatedAt).ToListAsync(cancellationToken);
+        await _context.Questions.AsNoTracking().Include(q => q.Category).Include(q => q.SubCategory).Where(q => q.SubCategoryId == subCategoryId).OrderBy(q => q.CreatedAt).ToListAsync(cancellationToken);
 
     public async Task<Question?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        await _context.Questions.FindAsync(new object[] { id }, cancellationToken);
+        await _context.Questions.AsNoTracking().Include(q => q.Category).Include(q => q.SubCategory).FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
 
     public async Task AddAsync(Question entity, CancellationToken cancellationToken = default) =>
         await _context.Questions.AddAsync(entity, cancellationToken);

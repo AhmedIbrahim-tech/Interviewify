@@ -8,6 +8,7 @@ public class User
     public string PasswordHash { get; set; } = string.Empty;
     public Role Role { get; set; } = Role.User;
     public UserStatus Status { get; set; } = UserStatus.Active;
+    public string? ProfilePicture { get; set; }
 
     public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
 }

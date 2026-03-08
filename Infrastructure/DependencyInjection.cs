@@ -32,6 +32,7 @@ public static class DependencyInjection
         services.AddSingleton<IPasswordHasher, BcryptPasswordHasher>();
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddScoped<ITokenService, JwtTokenService>();
+        services.AddScoped<IFileService, LocalFileService>();
 
         return services;
     }

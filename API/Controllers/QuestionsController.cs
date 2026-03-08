@@ -10,6 +10,14 @@ namespace API.Controllers;
 [Route(ApiRoutes.Questions.Controller)]
 public class QuestionsController(IQuestionService service) : ControllerBase
 {
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResult<IReadOnlyList<QuestionResponseDto>>>> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await service.GetAllAsync(cancellationToken);
+        if (!result.IsSuccess) return BadRequest(result);
+        return Ok(result);
+    }
     [HttpGet(ApiRoutes.Questions.BySubCategoryId)]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResult<IReadOnlyList<QuestionResponseDto>>>> GetBySubCategoryId(int subCategoryId, CancellationToken cancellationToken)

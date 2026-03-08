@@ -35,7 +35,10 @@ public class AuthService(
             refreshTokenValue,
             DateTime.UtcNow.AddMinutes(60),
             user.FullName,
-            user.Role.ToString()));
+            user.Role.ToString(),
+            user.Email,
+            user.ProfilePicture,
+            user.Id));
     }
 
     public async Task<ApiResult<AuthResponseDto>> RefreshTokenAsync(string refreshToken, CancellationToken cancellationToken = default)
@@ -70,10 +73,13 @@ public class AuthService(
 
         return ApiResult<AuthResponseDto>.Success(new AuthResponseDto(
             accessToken,
-            newRefreshValue,
+            newRefreshValue!,
             DateTime.UtcNow.AddMinutes(60),
             user.FullName,
-            user.Role.ToString()));
+            user.Role.ToString(),
+            user.Email,
+            user.ProfilePicture,
+            user.Id));
     }
 
     public async Task<ApiResult<bool>> LogoutAsync(string refreshToken, CancellationToken cancellationToken = default)

@@ -12,7 +12,7 @@ public class UserService(
     public async Task<ApiResult<IReadOnlyList<UserResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var users = await userRepository.GetAllAsync(cancellationToken);
-        var dtos = users.Select(u => new UserResponseDto(u.Id, u.FullName, u.Email, u.Role.ToString(), u.Status.ToString())).ToList();
+        var dtos = users.Select(u => new UserResponseDto(u.Id, u.FullName, u.Email, u.Role.ToString(), u.Status.ToString(), u.ProfilePicture)).ToList();
         return ApiResult<IReadOnlyList<UserResponseDto>>.Success(dtos);
     }
 
@@ -21,7 +21,7 @@ public class UserService(
         var user = await userRepository.GetByIdAsync(id, cancellationToken);
         if (user == null)
             return ApiResult<UserResponseDto?>.Failure("User not found.");
-        return ApiResult<UserResponseDto?>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString()));
+        return ApiResult<UserResponseDto?>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString(), user.ProfilePicture));
     }
 
     public async Task<ApiResult<UserResponseDto>> CreateUserAsync(CreateUserDto dto, CancellationToken cancellationToken = default)
@@ -36,12 +36,13 @@ public class UserService(
             Email = dto.Email,
             PasswordHash = passwordHasher.Hash(dto.Password),
             Role = Enum.Parse<Role>(dto.Role),
-            Status = UserStatus.Active
+            Status = UserStatus.Active,
+            ProfilePicture = dto.ProfilePicture
         };
         await userRepository.AddAsync(user, cancellationToken);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString()));
+        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString(), user.ProfilePicture));
     }
 
     public async Task<ApiResult<UserResponseDto>> UpdateUserAsync(int id, UpdateUserDto dto, CancellationToken cancellationToken = default)
@@ -57,10 +58,46 @@ public class UserService(
         user.FullName = dto.FullName;
         user.Email = dto.Email;
         user.Role = Enum.Parse<Role>(dto.Role);
+        user.ProfilePicture = dto.ProfilePicture;
         userRepository.Update(user);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString()));
+        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString(), user.ProfilePicture));
+    }
+
+    public async Task<ApiResult<UserResponseDto>> UpdateProfileAsync(int id, UpdateProfileDto dto, CancellationToken cancellationToken = default)
+    {
+        var user = await userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+            return ApiResult<UserResponseDto>.Failure("User not found.");
+
+        var existingByEmail = await userRepository.GetByEmailAsync(dto.Email, cancellationToken);
+        if (existingByEmail != null && existingByEmail.Id != id)
+            return ApiResult<UserResponseDto>.Failure("Another user with this email already exists.");
+
+        user.FullName = dto.FullName;
+        user.Email = dto.Email;
+        user.ProfilePicture = dto.ProfilePicture;
+        userRepository.Update(user);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString(), user.ProfilePicture));
+    }
+
+    public async Task<ApiResult<bool>> ChangePasswordAsync(int id, ChangePasswordDto dto, CancellationToken cancellationToken = default)
+    {
+        var user = await userRepository.GetByIdAsync(id, cancellationToken);
+        if (user == null)
+            return ApiResult<bool>.Failure("User not found.");
+
+        if (!passwordHasher.Verify(user.PasswordHash, dto.CurrentPassword))
+            return ApiResult<bool>.Failure("Invalid current password.");
+
+        user.PasswordHash = passwordHasher.Hash(dto.NewPassword);
+        userRepository.Update(user);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return ApiResult<bool>.Success(true);
     }
 
     public async Task<ApiResult<bool>> DeleteUserAsync(int id, CancellationToken cancellationToken = default)
@@ -84,6 +121,6 @@ public class UserService(
         userRepository.Update(user);
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString()));
+        return ApiResult<UserResponseDto>.Success(new UserResponseDto(user.Id, user.FullName, user.Email, user.Role.ToString(), user.Status.ToString(), user.ProfilePicture));
     }
 }

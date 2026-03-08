@@ -40,4 +40,17 @@ public static class ApiRoutes
         public const string Id = "{id:int}";
         public const string ToggleStatus = "{id:int}/toggle-status";
     }
+
+    public static class Account
+    {
+        public const string Controller = Base + "/account";
+        public const string Profile = "profile";
+        public const string ChangePassword = "change-password";
+    }
+
+    public static class Uploads
+    {
+        public const string Controller = Base + "/uploads";
+        public const string General = "general";
+    }
 }

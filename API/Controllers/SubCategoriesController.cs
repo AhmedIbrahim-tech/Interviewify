@@ -10,6 +10,24 @@ namespace API.Controllers;
 [Route(ApiRoutes.SubCategories.Controller)]
 public class SubCategoriesController(ISubCategoryService service) : ControllerBase
 {
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResult<IReadOnlyList<SubCategoryResponseDto>>>> GetAll(CancellationToken cancellationToken)
+    {
+        var result = await service.GetAllAsync(cancellationToken);
+        if (!result.IsSuccess) return BadRequest(result);
+        return Ok(result);
+    }
+
+    [HttpGet(ApiRoutes.SubCategories.Id)]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResult<SubCategoryResponseDto>>> GetById(int id, CancellationToken cancellationToken)
+    {
+        var result = await service.GetByIdAsync(id, cancellationToken);
+        if (!result.IsSuccess) return BadRequest(result);
+        return Ok(result);
+    }
+
     [HttpGet(ApiRoutes.SubCategories.ByCategoryId)]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResult<IReadOnlyList<SubCategoryResponseDto>>>> GetByCategoryId(int categoryId, CancellationToken cancellationToken)

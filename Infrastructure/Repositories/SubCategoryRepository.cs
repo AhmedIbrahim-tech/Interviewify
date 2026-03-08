@@ -14,11 +14,14 @@ public class SubCategoryRepository : ISubCategoryRepository
         _context = context;
     }
 
+    public async Task<IReadOnlyList<SubCategory>> GetAllAsync(CancellationToken cancellationToken = default) =>
+        await _context.SubCategories.AsNoTracking().Include(s => s.Category).OrderBy(s => s.Name).ToListAsync(cancellationToken);
+
     public async Task<IReadOnlyList<SubCategory>> GetByCategoryIdAsync(int categoryId, CancellationToken cancellationToken = default) =>
-        await _context.SubCategories.Where(s => s.CategoryId == categoryId).OrderBy(s => s.Name).ToListAsync(cancellationToken);
+        await _context.SubCategories.AsNoTracking().Include(s => s.Category).Where(s => s.CategoryId == categoryId).OrderBy(s => s.Name).ToListAsync(cancellationToken);
 
     public async Task<SubCategory?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
-        await _context.SubCategories.FindAsync(new object[] { id }, cancellationToken);
+        await _context.SubCategories.AsNoTracking().Include(s => s.Category).FirstOrDefaultAsync(s => s.Id == id, cancellationToken);
 
     public async Task AddAsync(SubCategory entity, CancellationToken cancellationToken = default) =>
         await _context.SubCategories.AddAsync(entity, cancellationToken);

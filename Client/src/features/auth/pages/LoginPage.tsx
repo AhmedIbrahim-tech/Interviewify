@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Code2, Users2, CheckCircle2, FolderOpen, Terminal, ShieldCheck, Home } from 'lucide-react';
 import { siteConfig } from '@/config/site';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import type { RootState } from '@/store';
 
 type PersistedRootState = RootState & { _persist?: { rehydrated?: boolean } };

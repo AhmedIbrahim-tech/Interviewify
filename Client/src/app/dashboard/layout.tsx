@@ -1,6 +1,6 @@
 'use client';
 
-import { DashboardAuthGuard } from '@/components/DashboardAuthGuard';
+import { DashboardAuthGuard } from '@/components/layout/DashboardAuthGuard';
 
 export default function DashboardLayout({
     children,

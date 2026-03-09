@@ -5,7 +5,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@/store';
 import { setStore } from '@/config/api';
 import { ToastContainer } from 'react-toastify';
-import { ThemeProvider } from '@/components/ThemeProvider';
+import { ThemeProvider } from '@/components/layout/ThemeProvider';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Inject store into API client so interceptors can read auth state (avoids circular dependency)

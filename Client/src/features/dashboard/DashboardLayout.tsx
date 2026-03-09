@@ -23,7 +23,7 @@ import {
     ChevronDown,
     User
 } from 'lucide-react';
-import { ThemeToggle } from '@/components/ThemeToggle';
+import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { siteConfig } from '@/config/site';
 
 const navSections = [

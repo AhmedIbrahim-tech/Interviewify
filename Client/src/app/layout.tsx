@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
-import { Providers } from "@/components/Providers";
+import { Providers } from "@/components/layout/Providers";
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {

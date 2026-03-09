@@ -44,6 +44,9 @@ public class JwtTokenService : ITokenService
         var expiration = DateTime.UtcNow.AddDays(_settings.RefreshTokenExpiryDays);
         return (token, expiration);
     }
+
+    public DateTime GetAccessTokenExpirationUtc() =>
+        DateTime.UtcNow.AddMinutes(_settings.ExpiryMinutes);
 }
 
 public class JwtSettings

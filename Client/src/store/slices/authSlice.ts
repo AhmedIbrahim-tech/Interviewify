@@ -3,8 +3,8 @@ import { authService, LoginRequest } from '@/services/authService';
 import type { RootState } from '@/store';
 
 // ── Types ───────────────────────────────────────────────────────────
-interface AuthUser {
-    id?: any;
+export interface AuthUser {
+    id?: number;
     name: string;
     email?: string;
     role: string;

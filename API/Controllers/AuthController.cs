@@ -36,9 +36,12 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [HttpPost(ApiRoutes.Auth.Logout)]
-    [Authorize]
-    public async Task<ActionResult<ApiResult<bool>>> Logout([FromBody] RefreshTokenRequestDto dto, CancellationToken cancellationToken)
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResult<bool>>> Logout([FromBody] RefreshTokenRequestDto dto, [FromServices] IValidator<RefreshTokenRequestDto> validator, CancellationToken cancellationToken)
     {
+        var validation = await validator.ValidateAsync(dto, cancellationToken);
+        if (!validation.IsValid)
+            return BadRequest(ApiResult<bool>.Failure("Validation failed", validation.Errors.Select(e => e.ErrorMessage)));
         var result = await authService.LogoutAsync(dto.RefreshToken, cancellationToken);
         return Ok(result);
     }

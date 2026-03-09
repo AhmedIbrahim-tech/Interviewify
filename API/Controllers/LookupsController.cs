@@ -1,4 +1,5 @@
 using Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers;
@@ -36,6 +37,7 @@ public class LookupsController : ControllerBase
     }
 
     [HttpGet("users")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> GetUsers(CancellationToken cancellationToken)
     {
         var result = await _lookupService.GetUsersAsync(cancellationToken);

@@ -49,7 +49,7 @@ Interviewify combines a **.NET Core Web API** backend with a **Next.js** fronten
 Interviewify/
 ├── API/                 # ASP.NET Core Web API (controllers, Program.cs)
 ├── Application/         # CQRS-style services, DTOs, validators, interfaces
-├── Domian/              # Domain entities (User, Category, SubCategory, Question, etc.)
+├── Domain/               # Domain entities (User, Category, SubCategory, Question, etc.)
 ├── Infrastructure/      # EF Core DbContext, repositories, JWT service, file uploads
 └── Client/              # Next.js app (pages, components, store, services)
 ```

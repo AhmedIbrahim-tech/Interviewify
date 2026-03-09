@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import DashboardLayout from '@/features/dashboard/DashboardLayout';
+import { siteConfig } from '@/config/site';
 import { PageHeader } from '@/components/shared/PageHeader';
 import {
     User as UserIcon,
@@ -27,9 +28,6 @@ import {
 } from 'lucide-react';
 import { accountService, UpdateProfileDto, ChangePasswordDto } from '@/services/accountService';
 import { uploadService } from '@/services/uploadService';
-import { categoryService } from '@/services/categoryService';
-import { questionService } from '@/services/questionService';
-import { userService } from '@/services/userService';
 import { toast } from 'react-toastify';
 import { useAppSelector } from '@/store/hooks';
 import { getFileUrl } from '@/config/api';
@@ -37,11 +35,13 @@ import Image from 'next/image';
 import { useDispatch } from 'react-redux';
 import { updateCredentials } from '@/store/slices/authSlice';
 
+type SettingsTabId = 'profile';
+
 const SettingsPage = () => {
     const dispatch = useDispatch();
     const { user, token, refreshToken } = useAppSelector(state => state.auth);
     const [loading, setLoading] = useState(false);
-    const [activeTab, setActiveTab] = useState<'profile'>('profile');
+    const [activeTab, setActiveTab] = useState<SettingsTabId>('profile');
     const [profileData, setProfileData] = useState<UpdateProfileDto>({
         fullName: '',
         email: '',
@@ -51,7 +51,7 @@ const SettingsPage = () => {
         currentPassword: '',
         newPassword: ''
     });
-    const [counts, setCounts] = useState({ categories: 0, questions: 0, users: 0 });
+    const [counts, setCounts] = useState<{ categories: number; questions: number; users: number | null }>({ categories: 0, questions: 0, users: null });
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -71,19 +71,16 @@ const SettingsPage = () => {
 
         const fetchCounts = async () => {
             try {
-                const [catRes, quesRes, userRes] = await Promise.all([
-                    categoryService.getAllCategories(),
-                    questionService.getAllQuestions(),
-                    userService.getAllUsers()
-                ]);
-
-                setCounts({
-                    categories: catRes.data?.length || 0,
-                    questions: quesRes.data?.length || 0,
-                    users: userRes.data?.length || 0
-                });
-            } catch (err) {
-                console.error("Failed to fetch dashboard counts", err);
+                const statsRes = await accountService.getStats();
+                if (statsRes.isSuccess && statsRes.data) {
+                    setCounts({
+                        categories: statsRes.data.categoryCount,
+                        questions: statsRes.data.questionCount,
+                        users: statsRes.data.userCount ?? null
+                    });
+                }
+            } catch {
+                // leave counts at 0
             }
         };
 
@@ -101,7 +98,7 @@ const SettingsPage = () => {
                 if (response.data) {
                     dispatch(updateCredentials({
                         user: {
-                            id: response.data.id,
+                            id: Number(response.data.id),
                             name: response.data.fullName,
                             email: response.data.email,
                             role: response.data.role,
@@ -167,8 +164,8 @@ const SettingsPage = () => {
     return (
         <DashboardLayout>
             <PageHeader
-                title="User Profile"
-                breadcrumbs={[{ label: 'Dashboard' }, { label: 'User Profile' }]}
+                title="Account Settings"
+                breadcrumbs={[{ label: 'Dashboard' }, { label: 'Account Settings' }]}
             />
 
             {/* Profile Header Card */}
@@ -191,18 +188,18 @@ const SettingsPage = () => {
                         {/* Column 1: Stats (Left) */}
                         <div className="flex items-center justify-center md:justify-start gap-8 md:gap-10 order-2 md:order-1 mt-4 md:mt-16">
                             <div className="text-center group cursor-default">
-                                <FileText size={18} className="mx-auto mb-2 text-gray-400 group-hover:text-[var(--primary)] transition-colors" />
+                                <FileText size={18} className="mx-auto mb-2 text-[var(--text-muted)] group-hover:text-[var(--primary)] transition-colors" />
                                 <p className="text-[18px] font-black text-[var(--text-primary)]">{counts.categories}</p>
                                 <p className="text-[11px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Categories</p>
                             </div>
                             <div className="text-center group cursor-default">
-                                <UsersIcon size={18} className="mx-auto mb-2 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                                <UsersIcon size={18} className="mx-auto mb-2 text-gray-400 group-hover:text-[var(--primary)] transition-colors" />
                                 <p className="text-[18px] font-black text-[var(--text-primary)]">{counts.questions}</p>
                                 <p className="text-[11px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Questions</p>
                             </div>
                             <div className="text-center group cursor-default">
                                 <UserIcon size={18} className="mx-auto mb-2 text-gray-400 group-hover:text-purple-500 transition-colors" />
-                                <p className="text-[18px] font-black text-[var(--text-primary)]">{counts.users}</p>
+                                <p className="text-[18px] font-black text-[var(--text-primary)]">{counts.users ?? '—'}</p>
                                 <p className="text-[11px] text-[var(--text-muted)] font-bold uppercase tracking-wider">Users</p>
                             </div>
                         </div>
@@ -211,7 +208,7 @@ const SettingsPage = () => {
                         <div className="flex flex-col items-center order-1 md:order-2 -mt-20 md:-mt-24">
                             <div className="relative group">
                                 <div className="h-[140px] w-[140px] rounded-full p-[3px] bg-linear-to-tr from-blue-500 via-purple-500 to-pink-500 shadow-2xl">
-                                    <div className="h-full w-full rounded-full border-[5px] border-white bg-white overflow-hidden relative">
+                                    <div className="h-full w-full rounded-full border-[5px] border-white bg-[var(--surface)] overflow-hidden relative">
                                         {profileData.profilePicture ? (
                                             <Image
                                                 src={getFileUrl(profileData.profilePicture)}
@@ -227,7 +224,7 @@ const SettingsPage = () => {
                                         )}
                                     </div>
                                 </div>
-                                <label className="absolute bottom-1 right-1 p-2.5 bg-white rounded-full text-[var(--primary)] border border-gray-100 cursor-pointer hover:bg-gray-50 shadow-lg tracking-normal transition-all hover:scale-110 active:scale-95 group-hover:rotate-6">
+                                <label className="absolute bottom-1 right-1 p-2.5 bg-[var(--surface)] rounded-full text-[var(--primary)] border border-[var(--border-color)] cursor-pointer hover:bg-[var(--surface-elevated)] shadow-lg tracking-normal transition-all hover:scale-110 active:scale-95 group-hover:rotate-6">
                                     <Camera size={16} />
                                     <input type="file" className="hidden" onChange={handleImageUpload} />
                                 </label>
@@ -246,16 +243,16 @@ const SettingsPage = () => {
                         {/* Column 3: Socials & Button (Right) */}
                         <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 order-3 mt-4 md:mt-16">
                             <div className="flex items-center gap-2 mr-2">
-                                <button className="h-8 w-8 rounded-full bg-[#1877F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md shadow-blue-500/10">
+                                <button className="h-8 w-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--muted-text)] flex items-center justify-center hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] hover:border-[var(--accent)]/30 transition-all shadow-[var(--shadow-sm)]">
                                     <Facebook size={14} fill="currentColor" />
                                 </button>
-                                <button className="h-8 w-8 rounded-full bg-[#1DA1F2] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md shadow-blue-400/10">
+                                <button className="h-8 w-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--muted-text)] flex items-center justify-center hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] hover:border-[var(--accent)]/30 transition-all shadow-[var(--shadow-sm)]">
                                     <Twitter size={14} fill="currentColor" />
                                 </button>
-                                <button className="h-8 w-8 rounded-full bg-[#EA4335] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md shadow-red-500/10">
+                                <button className="h-8 w-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--muted-text)] flex items-center justify-center hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] hover:border-[var(--accent)]/30 transition-all shadow-[var(--shadow-sm)]">
                                     <Youtube size={14} fill="currentColor" />
                                 </button>
-                                <button className="h-8 w-8 rounded-full bg-linear-to-tr from-[#f9ce34] via-[#ee2a7b] to-[#6228d7] text-white flex items-center justify-center hover:scale-110 transition-transform shadow-md shadow-purple-500/10">
+                                <button className="h-8 w-8 rounded-full bg-[var(--surface-elevated)] border border-[var(--border)] text-[var(--muted-text)] flex items-center justify-center hover:bg-[var(--accent-soft)] hover:text-[var(--accent)] hover:border-[var(--accent)]/30 transition-all shadow-[var(--shadow-sm)]">
                                     <Instagram size={14} />
                                 </button>
                             </div>
@@ -266,11 +263,11 @@ const SettingsPage = () => {
                     <div className="flex items-center justify-center border-t border-[var(--border-light)] mt-10">
                         <div className="flex items-center gap-8 overflow-x-auto no-scrollbar pt-1">
                             {[
-                                { id: 'profile', label: 'Settings', icon: Settings },
+                                { id: 'profile' as const, label: 'Settings', icon: Settings },
                             ].map((tab) => (
                                 <button
                                     key={tab.id}
-                                    onClick={() => setActiveTab(tab.id as any)}
+                                    onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-2 px-1 py-4 text-[13px] font-black border-b-2 transition-all whitespace-nowrap
                                         ${activeTab === tab.id
                                             ? 'border-[var(--primary)] text-[var(--primary)]'
@@ -298,25 +295,25 @@ const SettingsPage = () => {
 
                         <div className="space-y-4">
                             <div className="flex items-center gap-3.5">
-                                <div className="p-2 rounded-lg bg-gray-50 text-[var(--text-muted)]">
+                                <div className="p-2 rounded-lg bg-[var(--surface-elevated)] text-[var(--text-muted)]">
                                     <Briefcase size={16} />
                                 </div>
-                                <span className="text-[13px] text-[var(--text-secondary)] font-medium">Engineer at <strong>Interviewify</strong></span>
+                                <span className="text-[13px] text-[var(--text-secondary)] font-medium">Engineer at <strong>{siteConfig.name}</strong></span>
                             </div>
                             <div className="flex items-center gap-3.5">
-                                <div className="p-2 rounded-lg bg-gray-50 text-[var(--text-muted)]">
+                                <div className="p-2 rounded-lg bg-[var(--surface-elevated)] text-[var(--text-muted)]">
                                     <Mail size={16} />
                                 </div>
                                 <span className="text-[13px] text-[var(--text-secondary)] font-medium">{profileData.email}</span>
                             </div>
                             <div className="flex items-center gap-3.5">
-                                <div className="p-2 rounded-lg bg-gray-50 text-[var(--text-muted)]">
+                                <div className="p-2 rounded-lg bg-[var(--surface-elevated)] text-[var(--text-muted)]">
                                     <Globe size={16} />
                                 </div>
                                 <span className="text-[13px] text-[var(--text-secondary)] font-medium">www.interviewify.local</span>
                             </div>
                             <div className="flex items-center gap-3.5">
-                                <div className="p-2 rounded-lg bg-gray-50 text-[var(--text-muted)]">
+                                <div className="p-2 rounded-lg bg-[var(--surface-elevated)] text-[var(--text-muted)]">
                                     <MapPin size={16} />
                                 </div>
                                 <span className="text-[13px] text-[var(--text-secondary)] font-medium">Cairo, Egypt</span>

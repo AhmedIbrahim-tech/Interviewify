@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 
 namespace Application.Features.Questions;
 
@@ -18,6 +18,13 @@ public class QuestionService : IQuestionService
     public async Task<ApiResult<IReadOnlyList<QuestionResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var list = await _repository.GetAllAsync(cancellationToken);
+        var dtos = list.Select(e => new QuestionResponseDto(e.Id, e.Title, e.Answer, e.CategoryId, e.SubCategoryId, e.IsActive, e.CreatedAt, e.Category?.Name, e.SubCategory?.Name)).ToList();
+        return ApiResult<IReadOnlyList<QuestionResponseDto>>.Success(dtos);
+    }
+
+    public async Task<ApiResult<IReadOnlyList<QuestionResponseDto>>> GetByCategoryIdAsync(int categoryId, CancellationToken cancellationToken = default)
+    {
+        var list = await _repository.GetByCategoryIdAsync(categoryId, cancellationToken);
         var dtos = list.Select(e => new QuestionResponseDto(e.Id, e.Title, e.Answer, e.CategoryId, e.SubCategoryId, e.IsActive, e.CreatedAt, e.Category?.Name, e.SubCategory?.Name)).ToList();
         return ApiResult<IReadOnlyList<QuestionResponseDto>>.Success(dtos);
     }
@@ -42,7 +49,7 @@ public class QuestionService : IQuestionService
         var entity = new Question
         {
             Title = dto.Title,
-            Answer = dto.Answer,
+            Answer = dto.Answer ?? string.Empty,
             CategoryId = dto.CategoryId,
             SubCategoryId = dto.SubCategoryId,
             IsActive = dto.IsActive
@@ -60,7 +67,7 @@ public class QuestionService : IQuestionService
         if (entity == null)
             return ApiResult<QuestionResponseDto>.Failure("Question not found.");
         entity.Title = dto.Title;
-        entity.Answer = dto.Answer;
+        entity.Answer = dto.Answer ?? string.Empty;
         entity.IsActive = dto.IsActive;
         _repository.Update(entity);
         await _unitOfWork.SaveChangesAsync(cancellationToken);

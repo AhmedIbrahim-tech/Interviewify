@@ -16,9 +16,10 @@ const initialState: CategoryState = {
 
 export const fetchCategories = createAsyncThunk(
     'categories/fetchAll',
-    async (_, { rejectWithValue }) => {
+    async (options: { activeOnly?: boolean } | void, { rejectWithValue }) => {
         try {
-            const response = await categoryService.getAllCategories();
+            const activeOnly = options?.activeOnly ?? false;
+            const response = await categoryService.getAllCategories(activeOnly);
             if (response.isSuccess) {
                 return response.data;
             } else {

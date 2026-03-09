@@ -82,12 +82,12 @@ export function DataTable<T extends { id: string | number }>({
     if (loading) {
         return (
             <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-pulse">
-                <div className="h-12 bg-gray-50 border-b border-[var(--border-color)]" />
+                <div className="h-12 bg-[var(--surface-elevated)] border-b border-[var(--border-color)]" />
                 {[1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="px-6 py-5 border-b border-[var(--border-light)] last:border-0 flex gap-4">
-                        <div className="h-4 bg-gray-100 rounded w-1/4" />
-                        <div className="h-4 bg-gray-100 rounded w-1/4" />
-                        <div className="h-4 bg-gray-100 rounded w-1/4 ml-auto" />
+                        <div className="h-4 bg-[var(--surface-elevated)] rounded w-1/4" />
+                        <div className="h-4 bg-[var(--surface-elevated)] rounded w-1/4" />
+                        <div className="h-4 bg-[var(--surface-elevated)] rounded w-1/4 ml-auto" />
                     </div>
                 ))}
             </div>
@@ -99,12 +99,12 @@ export function DataTable<T extends { id: string | number }>({
             <div className="overflow-x-auto rounded-t-2xl overflow-hidden">
                 <table className="w-full text-left">
                     <thead>
-                        <tr className="border-b border-[var(--border-color)] bg-white/50">
+                        <tr className="border-b border-[var(--border-color)] bg-[var(--surface-elevated)]">
                             {selectable && (
                                 <th className="px-5 py-4 w-10">
                                     <input
                                         type="checkbox"
-                                        className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
+                                        className="h-4 w-4 rounded border-[var(--input-border)] text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
                                         checked={selectedRows.size > 0 && selectedRows.size === pagedData.length}
                                         onChange={toggleSelectAll}
                                     />
@@ -137,14 +137,14 @@ export function DataTable<T extends { id: string | number }>({
                                     <tr className={`
                                         border-b border-[var(--border-light)] last:border-0
                                         transition-all duration-200
-                                        ${isSelected ? 'bg-blue-50/40' : 'hover:bg-[#f6f9fc]'}
-                                        ${isExpanded ? 'bg-gray-50/80 shadow-inner' : ''}
+                                        ${isSelected ? 'bg-[var(--primary-light)]/50' : 'hover:bg-[var(--surface-elevated)]'}
+                                        ${isExpanded ? 'bg-[var(--surface-elevated)] shadow-inner' : ''}
                                     `}>
                                         {selectable && (
                                             <td className="px-5 py-4">
                                                 <input
                                                     type="checkbox"
-                                                    className="h-4 w-4 rounded border-gray-300 text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
+                                                    className="h-4 w-4 rounded border-[var(--input-border)] text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
                                                     checked={selectedRows.has(item.id)}
                                                     onChange={() => toggleSelectRow(item.id)}
                                                 />
@@ -161,20 +161,20 @@ export function DataTable<T extends { id: string | number }>({
                                                     {renderExpanded && (
                                                         <button
                                                             onClick={() => toggleRow(item.id)}
-                                                            className={`p-1.5 rounded-lg hover:bg-gray-100 text-[var(--text-muted)] transition-all ${isExpanded ? 'text-[var(--primary)] bg-blue-50' : ''}`}
+                                                            className={`p-1.5 rounded-lg hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] transition-all ${isExpanded ? 'text-[var(--primary)] bg-[var(--primary-light)]' : ''}`}
                                                         >
                                                             {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                                                         </button>
                                                     )}
                                                     {onView && (
-                                                        <button onClick={() => onView(item)} className="p-2 rounded-lg text-[var(--text-muted)] hover:bg-blue-50 hover:text-[var(--primary)] transition-colors">
+                                                        <button onClick={() => onView(item)} className="p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)] transition-colors">
                                                             <Eye size={16} />
                                                         </button>
                                                     )}
                                                     {onEdit && (
                                                         <button
                                                             onClick={() => onEdit(item)}
-                                                            className="p-2 rounded-lg text-amber-500 hover:bg-amber-50 transition-colors"
+                                                            className="p-2 rounded-lg text-[var(--warning)] hover:bg-[var(--warning-light)] transition-colors"
                                                             title="Edit"
                                                         >
                                                             <Pencil size={16} />
@@ -183,7 +183,7 @@ export function DataTable<T extends { id: string | number }>({
                                                     {onDelete && (
                                                         <button
                                                             onClick={() => onDelete(item.id)}
-                                                            className="p-2 rounded-lg text-rose-500 hover:bg-rose-50 transition-colors"
+                                                            className="p-2 rounded-lg text-[var(--danger)] hover:bg-[var(--danger-light)] transition-colors"
                                                             title="Delete"
                                                         >
                                                             <Trash2 size={16} />
@@ -194,9 +194,9 @@ export function DataTable<T extends { id: string | number }>({
                                         )}
                                     </tr>
                                     {isExpanded && renderExpanded && (
-                                        <tr className="bg-white/40">
+                                        <tr className="bg-[var(--surface-elevated)]">
                                             <td colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)} className="px-12 py-6 border-b border-[var(--border-light)]">
-                                                <div className="animate-fade-in bg-white p-4 rounded-xl border border-[var(--border-color)]">
+                                                <div className="animate-fade-in bg-[var(--card)] p-4 rounded-xl border border-[var(--border-color)]">
                                                     {renderExpanded(item)}
                                                 </div>
                                             </td>
@@ -211,7 +211,7 @@ export function DataTable<T extends { id: string | number }>({
 
             {/* Pagination Footer */}
             {data.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-gray-50/30 gap-4 rounded-b-2xl">
+                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--surface-elevated)] gap-4 rounded-b-2xl">
                     <div className="flex items-center gap-2">
                         <p className="text-[13px] text-[var(--text-muted)] font-medium whitespace-nowrap">
                             Rows per page:
@@ -239,14 +239,14 @@ export function DataTable<T extends { id: string | number }>({
                             <button
                                 disabled={currentPage === 1}
                                 onClick={() => setCurrentPage(p => p - 1)}
-                                className="p-2 rounded-xl text-[var(--text-muted)] hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 transition-all disabled:opacity-30"
+                                className="p-2 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface)] hover:shadow-sm border border-transparent hover:border-[var(--border-color)] transition-all disabled:opacity-30"
                             >
                                 <ChevronLeft size={18} />
                             </button>
                             <button
                                 disabled={currentPage === totalPages || totalPages === 0}
                                 onClick={() => setCurrentPage(p => p + 1)}
-                                className="p-2 rounded-xl text-[var(--text-muted)] hover:bg-white hover:shadow-sm border border-transparent hover:border-gray-200 transition-all disabled:opacity-30"
+                                className="p-2 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface)] hover:shadow-sm border border-transparent hover:border-[var(--border-color)] transition-all disabled:opacity-30"
                             >
                                 <ChevronRight size={18} />
                             </button>

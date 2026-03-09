@@ -2,10 +2,23 @@ import api from '@/config/api';
 import { Category, SubCategory } from '@/types/category';
 import { ApiResponse } from '@/types/api';
 
+export interface CreateCategoryPayload {
+    name: string;
+    description?: string | null;
+    isActive: boolean;
+}
+
+export interface UpdateCategoryPayload {
+    name: string;
+    description?: string | null;
+    isActive: boolean;
+}
+
 export const categoryService = {
-    getAllCategories: async (): Promise<ApiResponse<Category[]>> => {
-        // Backend: api/categories
-        const response = await api.get<ApiResponse<Category[]>>('/categories');
+    getAllCategories: async (activeOnly = false): Promise<ApiResponse<Category[]>> => {
+        const response = await api.get<ApiResponse<Category[]>>('/categories', {
+            params: activeOnly ? { activeOnly: 'true' } : undefined
+        });
         return response.data;
     },
 
@@ -21,14 +34,12 @@ export const categoryService = {
         return response.data;
     },
 
-    createCategory: async (data: any): Promise<ApiResponse<Category>> => {
-        // Backend: api/categories
+    createCategory: async (data: CreateCategoryPayload): Promise<ApiResponse<Category>> => {
         const response = await api.post<ApiResponse<Category>>('/categories', data);
         return response.data;
     },
 
-    updateCategory: async (id: number, data: any): Promise<ApiResponse<Category>> => {
-        // Backend: api/categories/{id}
+    updateCategory: async (id: number, data: UpdateCategoryPayload): Promise<ApiResponse<Category>> => {
         const response = await api.put<ApiResponse<Category>>(`/categories/${id}`, data);
         return response.data;
     },

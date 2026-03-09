@@ -21,7 +21,7 @@ const persistConfig = {
     key: 'root',
     version: 1,
     storage,
-    whitelist: ['auth'],
+    whitelist: ['auth'], // Auth (including tokens) persisted to localStorage. Known tradeoff: XSS could read tokens; HttpOnly cookies would reduce that risk.
 };
 
 const rootReducer = combineReducers({

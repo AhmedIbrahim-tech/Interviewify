@@ -2,6 +2,12 @@ import api from '@/config/api';
 import { User } from '@/types/user';
 import { ApiResponse } from '@/types/api';
 
+export interface StatsDto {
+    categoryCount: number;
+    questionCount: number;
+    userCount: number | null;
+}
+
 export interface UpdateProfileDto {
     fullName: string;
     email: string;
@@ -14,6 +20,11 @@ export interface ChangePasswordDto {
 }
 
 export const accountService = {
+    getStats: async (): Promise<ApiResponse<StatsDto>> => {
+        const response = await api.get<ApiResponse<StatsDto>>('/account/stats');
+        return response.data;
+    },
+
     getProfile: async (): Promise<ApiResponse<User>> => {
         const response = await api.get<ApiResponse<User>>('/account/profile');
         return response.data;

@@ -1,5 +1,6 @@
+/** id is number from API; may be string from route/display. */
 export interface User {
-    id: string;
+    id: number | string;
     fullName: string;
     email: string;
     role: string;

@@ -36,31 +36,50 @@ import { uploadService } from '@/services/uploadService';
 import { getFileUrl } from '@/config/api';
 import Image from 'next/image';
 
+export interface UserFormState {
+    fullName: string;
+    email: string;
+    role: string;
+    password: string;
+    profilePicture: string;
+    imageFile?: File | null;
+}
+
 const UserManagementPage = () => {
     const router = useRouter();
     const dispatch = useAppDispatch();
+    const { user } = useAppSelector(state => state.auth);
     const { items: users, loading, error } = useAppSelector(state => state.users);
     const { roles } = useAppSelector(state => state.lookups);
+
+    useEffect(() => {
+        if (user && user.role !== 'Admin') {
+            router.replace('/dashboard');
+        }
+    }, [user, router]);
 
     const [search, setSearch] = useState('');
     const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingUser, setEditingUser] = useState<User | null>(null);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<UserFormState>({
         fullName: '',
         email: '',
         role: 'User',
         password: '',
-        profilePicture: ''
+        profilePicture: '',
+        imageFile: null
     });
     const [confirmState, setConfirmState] = useState<{ open: boolean; id: number | null }>({ open: false, id: null });
     const [viewingUser, setViewingUser] = useState<User | null>(null);
     const [uploading, setUploading] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchUsers());
+        if (user?.role === 'Admin') {
+            dispatch(fetchUsers());
+        }
         dispatch(fetchRoles());
-    }, [dispatch]);
+    }, [dispatch, user?.role]);
 
     const columns: Column<User>[] = [
         {
@@ -99,8 +118,8 @@ const UserManagementPage = () => {
                 <button
                     onClick={() => dispatch(toggleUserStatus(Number(user.id)))}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-[12px] font-medium transition-all ${user.status === 'Active'
-                        ? 'bg-[var(--success-light)] text-[var(--success)] hover:bg-[#d0fff5]'
-                        : 'bg-[var(--danger-light)] text-[var(--danger)] hover:bg-[#fce0d8]'
+                        ? 'bg-[var(--success-light)] text-[var(--success)] hover:opacity-90'
+                        : 'bg-[var(--danger-light)] text-[var(--danger)] hover:opacity-90'
                         }`}
                 >
                     {user.status === 'Active' ? <ToggleRight size={15} /> : <ToggleLeft size={15} />}
@@ -111,7 +130,7 @@ const UserManagementPage = () => {
     ];
 
     const renderGridItem = (user: User, _: number, actions?: React.ReactNode) => (
-        <div key={user.id} className="group/card relative bg-[var(--bg-card)] rounded-[2.5rem] border border-[var(--border-color)] shadow-[0_8px_30px_rgb(0,0,0,0.02)] p-6 overflow-hidden hover:shadow-[0_20px_50px_rgba(0,0,0,0.06)] hover:border-[var(--primary)]/20 transition-all duration-500">
+        <div key={user.id} className="group/card relative bg-[var(--card)] rounded-[2.5rem] border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6 overflow-hidden hover:shadow-[var(--shadow-lg)] hover:border-[var(--primary)]/20 transition-all duration-500">
             {/* Background Decorative Icon */}
             <div className="absolute -right-8 -bottom-8 text-[var(--primary)]/5 -rotate-12 group-hover/card:scale-110 transiton-transform duration-700 pointer-events-none">
                 <Shield size={160} strokeWidth={1} />
@@ -137,7 +156,7 @@ const UserManagementPage = () => {
                     <Mail size={14} className="opacity-70" /> {user.email}
                 </p>
 
-                <div className="flex items-center justify-between pt-5 border-t border-gray-100/80">
+                <div className="flex items-center justify-between pt-5 border-t border-[var(--border-light)]">
                     <div className="flex items-center gap-2">
                         <div className="p-1.5 rounded-lg bg-[var(--primary-light)] text-[var(--primary)] shadow-sm">
                             <Shield size={14} />
@@ -205,7 +224,8 @@ const UserManagementPage = () => {
                 email: user.email,
                 role: user.role,
                 password: '',
-                profilePicture: user.profilePicture || ''
+                profilePicture: user.profilePicture || '',
+                imageFile: null
             });
         } else {
             setEditingUser(null);
@@ -214,7 +234,8 @@ const UserManagementPage = () => {
                 email: '',
                 role: 'User',
                 password: '',
-                profilePicture: ''
+                profilePicture: '',
+                imageFile: null
             });
         }
         setIsModalOpen(true);
@@ -225,20 +246,22 @@ const UserManagementPage = () => {
         try {
             let resultAction;
             if (editingUser) {
+                const { imageFile: _, ...updateData } = formData;
                 resultAction = await dispatch(editUser({
                     id: Number(editingUser.id),
-                    data: { ...formData }
+                    data: updateData
                 }));
             } else {
                 let profilePicture = formData.profilePicture;
-                if ((formData as any).imageFile) {
-                    const uploadRes = await uploadService.upload((formData as any).imageFile, 'profiles');
+                if (formData.imageFile) {
+                    const uploadRes = await uploadService.upload(formData.imageFile, 'profiles');
                     if (uploadRes.isSuccess) {
                         profilePicture = uploadRes.data!;
                     }
                 }
+                const { imageFile: __, ...createData } = formData;
                 resultAction = await dispatch(addUser({
-                    ...formData,
+                    ...createData,
                     profilePicture
                 }));
             }
@@ -291,7 +314,7 @@ const UserManagementPage = () => {
 
             {/* Overview Stickers */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8 stagger-children">
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-[var(--primary)]/30 transition-all group">
+                <div className="bg-[var(--card)] border border-[var(--border-color)] rounded-2xl p-6 shadow-sm hover:border-[var(--primary)]/30 transition-all group">
                     <div className="flex items-center justify-between mb-3">
                         <div className="p-2.5 rounded-xl bg-[var(--primary-light)] text-[var(--primary)] group-hover:scale-110 transition-transform">
                             <UsersIcon size={20} />
@@ -302,9 +325,9 @@ const UserManagementPage = () => {
                         <p className="text-[12px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-0.5">Total Users</p>
                     </div>
                 </div>
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-emerald-500/30 transition-all group">
+                <div className="bg-[var(--card)] border border-[var(--border-color)] rounded-2xl p-6 shadow-sm hover:border-[var(--success)]/30 transition-all group">
                     <div className="flex items-center justify-between mb-3">
-                        <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600 group-hover:scale-110 transition-transform">
+                        <div className="p-2.5 rounded-xl bg-[var(--success-soft)] text-[var(--success)] group-hover:scale-110 transition-transform">
                             <Shield size={20} />
                         </div>
                     </div>
@@ -313,9 +336,9 @@ const UserManagementPage = () => {
                         <p className="text-[12px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-0.5">Active Users</p>
                     </div>
                 </div>
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-purple-500/30 transition-all group">
+                <div className="bg-[var(--card)] border border-[var(--border-color)] rounded-2xl p-6 shadow-sm hover:border-[var(--primary)]/30 transition-all group">
                     <div className="flex items-center justify-between mb-3">
-                        <div className="p-2.5 rounded-xl bg-purple-50 text-purple-600 group-hover:scale-110 transition-transform">
+                        <div className="p-2.5 rounded-xl bg-[var(--accent-soft)] text-[var(--accent)] group-hover:scale-110 transition-transform">
                             <UserIcon size={20} />
                         </div>
                     </div>
@@ -324,7 +347,7 @@ const UserManagementPage = () => {
                         <p className="text-[12px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-0.5">Administrators</p>
                     </div>
                 </div>
-                <div className="bg-white border border-gray-100 rounded-2xl p-6 shadow-sm hover:border-amber-500/30 transition-all group">
+                <div className="bg-[var(--card)] border border-[var(--border-color)] rounded-2xl p-6 shadow-sm hover:border-[var(--warning)]/30 transition-all group">
                     <div className="flex items-center justify-between mb-3">
                         <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform">
                             <X size={20} />
@@ -352,13 +375,13 @@ const UserManagementPage = () => {
                 <div className="flex items-center gap-1.5 bg-[var(--bg-card)] border border-[var(--border-color)] rounded-lg p-1">
                     <button
                         onClick={() => setViewMode('grid')}
-                        className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[var(--primary-light)] text-[var(--primary)]' : 'text-[var(--text-muted)] hover:bg-gray-50'}`}
+                        className={`p-2 rounded-md transition-colors ${viewMode === 'grid' ? 'bg-[var(--primary-light)] text-[var(--primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--surface-elevated)]'}`}
                     >
                         <LayoutGrid size={16} />
                     </button>
                     <button
                         onClick={() => setViewMode('table')}
-                        className={`p-2 rounded-md transition-colors ${viewMode === 'table' ? 'bg-[var(--primary-light)] text-[var(--primary)]' : 'text-[var(--text-muted)] hover:bg-gray-50'}`}
+                        className={`p-2 rounded-md transition-colors ${viewMode === 'table' ? 'bg-[var(--primary-light)] text-[var(--primary)]' : 'text-[var(--text-muted)] hover:bg-[var(--surface-elevated)]'}`}
                     >
                         <List size={16} />
                     </button>
@@ -393,9 +416,9 @@ const UserManagementPage = () => {
                     {/* Light clear overlay */}
                     <div className="absolute inset-0 bg-[var(--primary)]/5" onClick={() => setIsModalOpen(false)} />
 
-                    <div className="absolute inset-y-0 right-0 w-full max-w-[500px] bg-white border-l border-gray-100 shadow-[-20px_0_50px_-20px_rgba(0,0,0,0.1)] animate-slide-in-right flex flex-col">
+                    <div className="absolute inset-y-0 right-0 w-full max-w-[500px] bg-[var(--card)] border-l border-[var(--border-color)] shadow-[var(--shadow-lg)] animate-slide-in-right flex flex-col">
                         {/* Header */}
-                        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-50 flex-shrink-0">
+                        <div className="flex items-center justify-between px-8 py-6 border-b border-[var(--border-light)] flex-shrink-0">
                             <div>
                                 <h2 className="text-[19px] font-extrabold text-[var(--text-primary)] tracking-tight">
                                     {editingUser ? 'Edit' : 'Create'} User
@@ -404,18 +427,18 @@ const UserManagementPage = () => {
                             </div>
                             <button
                                 onClick={() => setIsModalOpen(false)}
-                                className="p-2.5 rounded-xl hover:bg-gray-50 text-[var(--text-muted)] transition-all hover:rotate-90"
+                                className="p-2.5 rounded-xl hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] transition-all hover:rotate-90"
                             >
                                 <X size={20} />
                             </button>
                         </div>
 
                         {/* Form */}
-                        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-8 bg-white">
+                        <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-8 custom-scrollbar space-y-8 bg-[var(--background)]">
                             {/* Avatar Upload */}
                             <div className="flex justify-center mb-4">
                                 <div className="relative group">
-                                    <div className="h-24 w-24 rounded-3xl bg-white flex items-center justify-center text-[var(--primary)] font-bold text-[28px] overflow-hidden relative border-2 border-gray-100 shadow-sm transition-all group-hover:border-[var(--primary)]/30 group-hover:scale-[1.02]">
+                                    <div className="h-24 w-24 rounded-3xl bg-[var(--surface)] flex items-center justify-center text-[var(--primary)] font-bold text-[28px] overflow-hidden relative border-2 border-[var(--border-color)] shadow-sm transition-all group-hover:border-[var(--primary)]/30 group-hover:scale-[1.02]">
                                         {formData.profilePicture ? (
                                             <Image
                                                 src={formData.profilePicture.startsWith('data:') ? formData.profilePicture : getFileUrl(formData.profilePicture)}
@@ -447,7 +470,7 @@ const UserManagementPage = () => {
                                 <div>
                                     <label className="block text-[12px] font-bold text-[var(--text-muted)] mb-2 uppercase tracking-widest">Full Name</label>
                                     <div className="relative group">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--primary)] transition-colors">
                                             <UserIcon size={18} />
                                         </div>
                                         <input
@@ -456,7 +479,7 @@ const UserManagementPage = () => {
                                             value={formData.fullName}
                                             onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                             placeholder="John Doe"
-                                            className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-[13px] font-semibold text-[var(--text-primary)] focus:ring-4 focus:ring-[var(--primary)]/5 focus:border-[var(--primary)] outline-none transition-all shadow-sm"
+                                            className="w-full bg-[var(--input)] border border-[var(--input-border)] rounded-xl py-3 pl-11 pr-4 text-[13px] font-semibold text-[var(--text-primary)] focus:ring-4 focus:ring-[var(--primary)]/5 focus:border-[var(--primary)] outline-none transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -464,7 +487,7 @@ const UserManagementPage = () => {
                                 <div>
                                     <label className="block text-[12px] font-bold text-[var(--text-muted)] mb-2 uppercase tracking-widest">Email Address</label>
                                     <div className="relative group">
-                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-[var(--primary)] transition-colors">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--primary)] transition-colors">
                                             <Mail size={18} />
                                         </div>
                                         <input
@@ -473,7 +496,7 @@ const UserManagementPage = () => {
                                             value={formData.email}
                                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                             placeholder="user@interviewify.com"
-                                            className="w-full bg-white border border-gray-200 rounded-xl py-3 pl-11 pr-4 text-[13px] font-semibold text-[var(--text-primary)] focus:ring-4 focus:ring-[var(--primary)]/5 focus:border-[var(--primary)] outline-none transition-all shadow-sm"
+                                            className="w-full bg-[var(--input)] border border-[var(--input-border)] rounded-xl py-3 pl-11 pr-4 text-[13px] font-semibold text-[var(--text-primary)] focus:ring-4 focus:ring-[var(--primary)]/5 focus:border-[var(--primary)] outline-none transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
@@ -491,7 +514,7 @@ const UserManagementPage = () => {
                                     </div>
                                     <div>
                                         <label className="block text-[12px] font-bold text-[var(--text-muted)] mb-2 uppercase tracking-widest">
-                                            Password {editingUser && <span className="text-gray-400 font-normal shadow-none lowercase">(optional)</span>}
+                                            Password {editingUser && <span className="text-[var(--text-muted)] font-normal shadow-none lowercase">(optional)</span>}
                                         </label>
                                         <input
                                             type="password"
@@ -499,17 +522,17 @@ const UserManagementPage = () => {
                                             value={formData.password}
                                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                             placeholder="••••••••"
-                                            className="w-full bg-white border border-gray-200 rounded-xl py-3 px-4 text-[13px] font-semibold text-[var(--text-primary)] focus:ring-4 focus:ring-[var(--primary)]/5 focus:border-[var(--primary)] outline-none transition-all shadow-sm"
+                                            className="w-full bg-[var(--input)] border border-[var(--input-border)] rounded-xl py-3 px-4 text-[13px] font-semibold text-[var(--text-primary)] focus:ring-4 focus:ring-[var(--primary)]/5 focus:border-[var(--primary)] outline-none transition-all shadow-sm"
                                         />
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="flex gap-4 pt-4 border-t border-gray-100 mt-2">
+                            <div className="flex gap-4 pt-4 border-t border-[var(--border-light)] mt-2">
                                 <button
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
-                                    className="flex-1 px-6 py-3.5 rounded-xl border border-gray-200 text-[14px] font-bold text-[var(--text-secondary)] hover:bg-gray-50 transition-all active:scale-95"
+                                    className="flex-1 px-6 py-3.5 rounded-xl border border-[var(--border-color)] text-[14px] font-bold text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] transition-all active:scale-95"
                                 >
                                     Cancel
                                 </button>
@@ -539,10 +562,10 @@ const UserManagementPage = () => {
             {/* User View Modal */}
             {viewingUser && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-md" onClick={() => setViewingUser(null)} />
-                    <div className="relative w-full max-w-[500px] bg-white rounded-[3rem] shadow-[0_30px_100px_rgba(0,0,0,0.15)] overflow-hidden animate-scale-in flex flex-col">
+                    <div className="absolute inset-0 bg-[var(--overlay)] backdrop-blur-md" onClick={() => setViewingUser(null)} />
+                    <div className="relative w-full max-w-[500px] bg-[var(--card)] rounded-[3rem] shadow-[var(--shadow-lg)] overflow-hidden animate-scale-in flex flex-col">
                         <div className="px-10 py-10 relative">
-                            <button onClick={() => setViewingUser(null)} className="absolute top-8 right-8 p-2.5 rounded-2xl text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-all z-10">
+                            <button onClick={() => setViewingUser(null)} className="absolute top-8 right-8 p-2.5 rounded-2xl text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] hover:text-[var(--primary-text)] transition-all z-10">
                                 <X size={20} />
                             </button>
 
@@ -555,7 +578,7 @@ const UserManagementPage = () => {
                                             viewingUser.fullName.charAt(0)
                                         )}
                                     </div>
-                                    <div className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-white shadow-lg border border-gray-50">
+                                    <div className="absolute -bottom-2 -right-2 p-2 rounded-xl bg-[var(--card)] shadow-lg border border-[var(--border-color)]">
                                         <StatusBadge label={viewingUser.status} variant={viewingUser.status === 'Active' ? 'success' : 'danger'} size="sm" pulse={viewingUser.status === 'Active'} />
                                     </div>
                                 </div>
@@ -569,19 +592,19 @@ const UserManagementPage = () => {
 
                             <div className="space-y-6">
                                 <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-6 rounded-3xl bg-gray-50/50 border border-gray-100 shadow-inner">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">Account Role</p>
+                                    <div className="p-6 rounded-3xl bg-[var(--surface-elevated)] border border-[var(--border-color)] shadow-inner">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">Account Role</p>
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-xl bg-white shadow-sm border border-gray-50 text-[var(--primary)]">
+                                            <div className="p-2 rounded-xl bg-[var(--surface)] shadow-sm border border-[var(--border-light)] text-[var(--primary)]">
                                                 <Shield size={18} />
                                             </div>
                                             <span className="text-[16px] font-extrabold text-[var(--text-primary)]">{viewingUser.role}</span>
                                         </div>
                                     </div>
-                                    <div className="p-6 rounded-3xl bg-gray-50/50 border border-gray-100 shadow-inner">
-                                        <p className="text-[10px] font-black uppercase tracking-widest text-gray-400 mb-2">User ID</p>
+                                    <div className="p-6 rounded-3xl bg-[var(--surface-elevated)] border border-[var(--border-color)] shadow-inner">
+                                        <p className="text-[10px] font-black uppercase tracking-widest text-[var(--text-muted)] mb-2">User ID</p>
                                         <div className="flex items-center gap-3">
-                                            <div className="p-2 rounded-xl bg-white shadow-sm border border-gray-50 text-gray-400">
+                                            <div className="p-2 rounded-xl bg-[var(--surface)] shadow-sm border border-[var(--border-light)] text-[var(--text-muted)]">
                                                 <UserIcon size={18} />
                                             </div>
                                             <span className="text-[16px] font-extrabold text-[var(--text-primary)]">#{viewingUser.id}</span>
@@ -591,7 +614,7 @@ const UserManagementPage = () => {
 
                                 <div className="p-6 rounded-[2.5rem] bg-indigo-50/30 border border-indigo-100/50 flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="p-3 rounded-2xl bg-indigo-500 text-white shadow-lg shadow-indigo-200">
+                                        <div className="p-3 rounded-2xl bg-[var(--accent)] text-[var(--accent-foreground)] shadow-lg shadow-[var(--accent)]/20">
                                             <Shield size={20} />
                                         </div>
                                         <div>
@@ -603,7 +626,7 @@ const UserManagementPage = () => {
 
                                 <button
                                     onClick={() => setViewingUser(null)}
-                                    className="w-full py-4 rounded-2xl bg-gray-900 hover:bg-black text-white text-[15px] font-bold transition-all shadow-xl shadow-gray-200 active:scale-[0.98] mt-4"
+                                    className="w-full py-4 rounded-2xl bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-[15px] font-bold transition-all shadow-xl shadow-[var(--shadow-md)] active:scale-[0.98] mt-4"
                                 >
                                     Dismiss Profile
                                 </button>

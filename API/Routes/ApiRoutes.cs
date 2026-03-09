@@ -21,6 +21,7 @@ public static class ApiRoutes
     public static class Questions
     {
         public const string Controller = Base + "/questions";
+        public const string ByCategoryId = "by-category/{categoryId:int}";
         public const string BySubCategoryId = "by-subcategory/{subCategoryId:int}";
         public const string Id = "{id:int}";
     }
@@ -46,6 +47,7 @@ public static class ApiRoutes
         public const string Controller = Base + "/account";
         public const string Profile = "profile";
         public const string ChangePassword = "change-password";
+        public const string Stats = "stats";
     }
 
     public static class Uploads

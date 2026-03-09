@@ -12,9 +12,9 @@ public class CategoriesController(ICategoryService service) : ControllerBase
 {
     [HttpGet(ApiRoutes.Categories.GetAll)]
     [AllowAnonymous]
-    public async Task<IActionResult> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromQuery] bool activeOnly = false, CancellationToken cancellationToken = default)
     {
-        var result = await service.GetAllAsync(cancellationToken);
+        var result = await service.GetAllAsync(activeOnly, cancellationToken);
         if (!result.IsSuccess) return BadRequest(result);
         return Ok(result);
     }

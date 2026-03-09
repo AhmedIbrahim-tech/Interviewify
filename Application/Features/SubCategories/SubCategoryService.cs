@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 
 namespace Application.Features.SubCategories;
 
@@ -33,7 +33,7 @@ public class SubCategoryService : ISubCategoryService
     {
         var e = await _repository.GetByIdAsync(id, cancellationToken);
         if (e == null) return ApiResult<SubCategoryResponseDto>.Failure("SubCategory not found.");
-        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId));
+        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.Category?.Name));
     }
 
     public async Task<ApiResult<SubCategoryResponseDto>> CreateAsync(CreateSubCategoryDto dto, CancellationToken cancellationToken = default)

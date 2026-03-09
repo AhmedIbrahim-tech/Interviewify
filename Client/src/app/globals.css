@@ -2,47 +2,82 @@
 
 /* ================================
    INTERVIEWIFY DESIGN SYSTEM
-   Premium Light SaaS Theme
+   Semantic theme – calm, premium, readable
+   One brand accent (blue-violet), soft semantics
    ================================ */
 
+/* ---------- LIGHT MODE (soft, eye-friendly – no pure white) ---------- */
 :root {
-  /* Background */
-  --bg-body: #ffffff;
-  --bg-card: #ffffff;
-  --bg-sidebar: #ffffff;
-  --bg-topbar: #ffffff;
+  /* Foundation – off-whites and soft grays to reduce glare */
+  --background: #F2F4F7;
+  --background-secondary: #E8ECF1;
+  --surface: #F8F9FB;
+  --surface-elevated: #FFFFFF;
+  --card: #F8F9FB;
+  --sidebar: #F6F7FA;
+  --navbar: #F8F9FB;
+  --input: #F8F9FB;
+  --border: #DDE2E8;
+  --border-light: #E8ECF1;
 
-  /* Primary */
-  --primary: #5d87ff;
-  --primary-hover: #4570ea;
-  --primary-light: #ecf2ff;
-  --primary-dark: #3a5bc7;
+  /* Legacy aliases */
+  --bg-body: var(--background);
+  --bg-card: var(--card);
+  --bg-sidebar: var(--sidebar);
+  --bg-topbar: var(--navbar);
+  --border-color: var(--border);
+  --input-border: var(--border);
 
-  /* Text */
-  --text-primary: #2a3547;
-  --text-secondary: #5a6a85;
-  --text-muted: #7c8fac;
-  --text-light: #aeb9cb;
+  /* Text – slightly softer than pure black for less eye strain */
+  --primary-text: #1E293B;
+  --secondary-text: #475569;
+  --muted-text: #64748B;
+  --text-primary: var(--primary-text);
+  --text-secondary: var(--secondary-text);
+  --text-muted: var(--muted-text);
+  --text-light: #94A3B8;
 
-  /* Borders */
-  --border-color: #e5eaef;
-  --border-light: #f0f3f7;
+  /* Brand accent */
+  --accent: #6366F1;
+  --accent-hover: #4F46E5;
+  --accent-soft: #E8EAFA;
+  --primary: var(--accent);
+  --primary-hover: var(--accent-hover);
+  --primary-light: var(--accent-soft);
+  --primary-dark: #4F46E5;
 
-  /* Status */
-  --success: #13deb9;
-  --success-light: #e6fffa;
-  --warning: #ffae1f;
-  --warning-light: #fff8ec;
-  --danger: #fa896b;
-  --danger-light: #fdede8;
-  --info: #539bff;
-  --info-light: #ebf3fe;
+  /* Semantic – slightly muted for calmer light mode */
+  --success: #0D9668;
+  --success-soft: #E6F7F0;
+  --success-light: var(--success-soft);
+  --warning: #D97706;
+  --warning-soft: #FEF6E8;
+  --warning-light: var(--warning-soft);
+  --danger: #DC2626;
+  --danger-soft: #FDF2F2;
+  --danger-light: var(--danger-soft);
+  --danger-hover: #B91C1C;
+  --info: #0284C7;
+  --info-soft: #EFF8FC;
+  --info-light: var(--info-soft);
 
-  /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.06);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.06);
-  --shadow-card: 0 2px 12px 0 rgb(0 0 0 / 0.04);
+  /* On-accent text (buttons, badges) */
+  --accent-foreground: #FFFFFF;
+
+  /* Modal/overlay backdrop (not pure black) */
+  --overlay: rgb(0 0 0 / 0.28);
+
+  /* Focus & shadows – very soft to avoid harsh edges */
+  --focus-ring: var(--accent);
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.03);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.03);
+  --shadow: var(--shadow-md);
+
+  /* Hover / active (reference) */
+  --hover-overlay: rgb(0 0 0 / 0.03);
+  --active-overlay: rgb(0 0 0 / 0.05);
 
   /* Radius */
   --radius-sm: 6px;
@@ -52,17 +87,115 @@
   --radius-full: 9999px;
 }
 
+/* ---------- DARK MODE (layered navy, no pure black) ---------- */
+.dark {
+  /* Foundation */
+  --background: #0B1120;
+  --background-secondary: #111827;
+  --surface: #0F172A;
+  --surface-elevated: #162033;
+  --card: #111C2E;
+  --sidebar: #0B1220;
+  --navbar: #0E1728;
+  --input: #111C2E;
+  --border: #22314A;
+  --border-light: #1E293B;
+
+  --bg-body: var(--background);
+  --bg-card: var(--card);
+  --bg-sidebar: var(--sidebar);
+  --bg-topbar: var(--navbar);
+  --border-color: var(--border);
+  --input-border: var(--border);
+
+  /* Text */
+  --primary-text: #E5EEF9;
+  --secondary-text: #B6C2D2;
+  --muted-text: #8A97A8;
+  --text-primary: var(--primary-text);
+  --text-secondary: var(--secondary-text);
+  --text-muted: var(--muted-text);
+  --text-light: #64748B;
+
+  /* Brand accent */
+  --accent: #7C86FF;
+  --accent-hover: #6366F1;
+  --accent-soft: #1E293B;
+  --primary: var(--accent);
+  --primary-hover: var(--accent-hover);
+  --primary-light: var(--accent-soft);
+  --primary-dark: #6366F1;
+
+  /* Semantic */
+  --success: #22C55E;
+  --success-soft: #0F2A20;
+  --success-light: var(--success-soft);
+  --warning: #F59E0B;
+  --warning-soft: #2B2111;
+  --warning-light: var(--warning-soft);
+  --danger: #F87171;
+  --danger-soft: #2A1618;
+  --danger-light: var(--danger-soft);
+  --danger-hover: #FCA5A5;
+  --info: #38BDF8;
+  --info-soft: #132A3A;
+  --info-light: var(--info-soft);
+
+  /* On-accent text */
+  --accent-foreground: #FFFFFF;
+
+  /* Modal/overlay backdrop (layered, not pure black) */
+  --overlay: rgb(0 0 0 / 0.5);
+
+  /* Focus & shadows (soft, dark) */
+  --focus-ring: var(--accent);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.25);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.3), 0 2px 6px -2px rgb(0 0 0 / 0.2);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.35), 0 4px 8px -4px rgb(0 0 0 / 0.25);
+  --shadow-card: 0 4px 16px 0 rgb(0 0 0 / 0.3);
+  --shadow: var(--shadow-md);
+
+  --hover-overlay: rgb(255 255 255 / 0.04);
+  --active-overlay: rgb(255 255 255 / 0.06);
+}
+
 @theme inline {
-  --color-background: var(--bg-body);
-  --color-foreground: var(--text-primary);
+  /* Semantic colors for Tailwind (bg-background, text-foreground, etc.) */
+  --color-background: var(--background);
+  --color-background-secondary: var(--background-secondary);
+  --color-foreground: var(--primary-text);
+  --color-card: var(--card);
+  --color-surface: var(--surface);
+  --color-surface-elevated: var(--surface-elevated);
+  --color-sidebar: var(--sidebar);
+  --color-navbar: var(--navbar);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-border-light: var(--border-light);
+  --color-primary-text: var(--primary-text);
+  --color-secondary-text: var(--secondary-text);
+  --color-muted-text: var(--muted-text);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-overlay: var(--overlay);
   --font-sans: 'Plus Jakarta Sans Variable', var(--font-geist-sans), system-ui, -apple-system, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 }
 
 /* Base */
 body {
-  background: var(--bg-body);
-  color: var(--text-primary);
+  background: var(--background);
+  color: var(--primary-text);
   font-family: 'Plus Jakarta Sans Variable', system-ui, -apple-system, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -87,7 +220,6 @@ body {
   background: var(--text-muted);
 }
 
-/* Custom scrollbar for modals */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -103,13 +235,17 @@ body {
 
 /* Selection */
 ::selection {
-  background: var(--primary);
-  color: #ffffff;
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.dark ::selection {
+  color: var(--background);
 }
 
 /* Focus ring */
 *:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid var(--focus-ring);
   outline-offset: 2px;
 }
 
@@ -124,7 +260,6 @@ body {
     opacity: 0;
     transform: translateY(4px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -136,7 +271,6 @@ body {
     opacity: 0;
     transform: translateY(-8px);
   }
-
   to {
     opacity: 1;
     transform: translateY(0);
@@ -148,7 +282,6 @@ body {
     opacity: 0;
     transform: scale(0.95);
   }
-
   to {
     opacity: 1;
     transform: scale(1);
@@ -159,7 +292,6 @@ body {
   from {
     transform: translateX(100%);
   }
-
   to {
     transform: translateX(0);
   }
@@ -181,32 +313,15 @@ body {
   animation: slideInRight 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Stagger children animation */
-.stagger-children>* {
+/* Stagger children */
+.stagger-children > * {
   opacity: 0;
   animation: fadeIn 0.4s ease-out forwards;
 }
 
-.stagger-children>*:nth-child(1) {
-  animation-delay: 0ms;
-}
-
-.stagger-children>*:nth-child(2) {
-  animation-delay: 50ms;
-}
-
-.stagger-children>*:nth-child(3) {
-  animation-delay: 100ms;
-}
-
-.stagger-children>*:nth-child(4) {
-  animation-delay: 150ms;
-}
-
-.stagger-children>*:nth-child(5) {
-  animation-delay: 200ms;
-}
-
-.stagger-children>*:nth-child(6) {
-  animation-delay: 250ms;
-}
+.stagger-children > *:nth-child(1) { animation-delay: 0ms; }
+.stagger-children > *:nth-child(2) { animation-delay: 50ms; }
+.stagger-children > *:nth-child(3) { animation-delay: 100ms; }
+.stagger-children > *:nth-child(4) { animation-delay: 150ms; }
+.stagger-children > *:nth-child(5) { animation-delay: 200ms; }
+.stagger-children > *:nth-child(6) { animation-delay: 250ms; }

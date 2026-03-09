@@ -1,76 +1,76 @@
 "use client";
 
 import React, { useEffect, useState } from 'react';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { questionService } from '@/services/questionService';
+import { subCategoryService } from '@/services/subCategoryService';
 import { Question } from '@/types/question';
+import { SubCategory } from '@/types/category';
 import { toast } from 'react-toastify';
+import { ArrowRight } from 'lucide-react';
+import { LoadingSpinner } from '@/components/shared/LoadingSpinner';
 
 const SubCategoryQuestionsPage = () => {
     const { id } = useParams();
-    const router = useRouter();
+    const [subCategory, setSubCategory] = useState<SubCategory | null>(null);
     const [questions, setQuestions] = useState<Question[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadQuestions = async () => {
+        const load = async () => {
+            if (!id) return;
             try {
-                const response = await questionService.getQuestionsBySubCategory(Number(id));
-                if (response.isSuccess) {
-                    if (response.data.length > 0) {
-                        // Automatically enter immersive mode at the first question
-                        router.replace(`/question/${response.data[0].id}`);
-                    } else {
-                        setQuestions([]);
-                    }
-                } else {
-                    toast.error(response.message);
+                const [subRes, quesRes] = await Promise.all([
+                    subCategoryService.getSubCategoryById(Number(id)),
+                    questionService.getQuestionsBySubCategory(Number(id))
+                ]);
+                if (subRes.isSuccess) setSubCategory(subRes.data);
+                if (quesRes.isSuccess) setQuestions(quesRes.data);
+                if (!subRes.isSuccess) {
+                    toast.error(subRes.message || 'Module not found');
                 }
             } catch (err) {
-                toast.error("Failed to load specialization path");
+                toast.error('Failed to load module');
             } finally {
                 setLoading(false);
             }
         };
-
-        if (id) loadQuestions();
-    }, [id, router]);
+        load();
+    }, [id]);
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-                <div className="relative">
-                    <div className="h-16 w-16 rounded-full border-t-2 border-b-2 border-blue-600 animate-spin"></div>
-                    <div className="absolute inset-0 flex items-center justify-center text-blue-500 font-black text-xs">I</div>
-                </div>
+            <div className="min-h-screen bg-[var(--background)] flex items-center justify-center">
+                <LoadingSpinner />
             </div>
         );
     }
 
-    const categoryId = questions.length > 0 ? questions[0].categoryId : null;
-    const subCategoryName = questions.length > 0 ? questions[0].subCategoryName : 'Module';
+    const categoryId = subCategory?.categoryId ?? (questions[0]?.categoryId);
+    const categoryName = questions[0]?.categoryName ?? 'Topic';
+    const moduleName = subCategory?.name ?? questions[0]?.subCategoryName ?? 'Module';
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white font-sans selection:bg-blue-600/30">
+        <div className="min-h-screen bg-[var(--background)] text-[var(--primary-text)] font-sans selection:bg-[var(--accent)]/30">
             <div className="max-w-5xl mx-auto px-6 py-12 lg:px-8">
                 <Link
-                    href={categoryId ? `/category/${categoryId}` : "/"}
-                    className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-gray-500 hover:text-blue-500 mb-12 transition-all group"
+                    href={categoryId ? `/category/${categoryId}` : '/'}
+                    className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[var(--muted-text)] hover:text-[var(--accent)] mb-12 transition-all group"
                 >
-                    <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to {questions[0]?.categoryName || 'Category'}
+                    <span className="group-hover:-translate-x-1 transition-transform">←</span> Back to {categoryName}
                 </Link>
 
                 <div className="mb-16">
                     <div className="flex items-center gap-3 mb-4">
-                        <span className="h-1.5 w-1.5 rounded-full bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-blue-500">Learning Path</span>
+                        <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-[var(--accent)]">Module</span>
                     </div>
-                    <h1 className="text-4xl font-black tracking-tight mb-6 bg-linear-to-r from-white to-gray-500 bg-clip-text text-transparent">
-                        {subCategoryName}
+                    <h1 className="text-4xl font-black tracking-tight mb-6 text-[var(--primary-text)]">
+                        {moduleName}
                     </h1>
-                    <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-2xl">
-                        Deepen your understanding through our curated list of technical interview questions and comprehensive answers.
+                    <p className="text-[var(--secondary-text)] text-sm font-medium leading-relaxed max-w-2xl">
+                        Questions and answers for this module. Click a question to view the full solution.
                     </p>
                 </div>
 
@@ -79,29 +79,29 @@ const SubCategoryQuestionsPage = () => {
                         <Link
                             key={q.id}
                             href={`/question/${q.id}`}
-                            className="block p-6 rounded-3xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.04] hover:border-blue-500/20 transition-all group relative overflow-hidden"
+                            className="block p-6 rounded-3xl bg-[var(--card)] border border-[var(--border-color)] hover:border-[var(--accent)]/30 transition-all group relative overflow-hidden"
                         >
                             <div className="relative z-10 flex items-center justify-between">
                                 <div className="flex items-center gap-6">
-                                    <span className="text-xs font-black text-gray-600 group-hover:text-blue-500 transition-colors">
+                                    <span className="text-xs font-black text-[var(--muted-text)] group-hover:text-[var(--accent)] transition-colors">
                                         {String(idx + 1).padStart(2, '0')}
                                     </span>
-                                    <h3 className="text-lg font-bold text-gray-200 group-hover:text-white transition-colors">
+                                    <h3 className="text-lg font-bold text-[var(--secondary-text)] group-hover:text-[var(--primary-text)] transition-colors">
                                         {q.title}
                                     </h3>
                                 </div>
                                 <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all -translate-x-4 group-hover:translate-x-0">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-blue-500">View Solution</span>
-                                    <span className="text-blue-500">→</span>
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-[var(--accent)]">View</span>
+                                    <ArrowRight size={16} className="text-[var(--accent)]" />
                                 </div>
                             </div>
                         </Link>
                     ))}
 
                     {questions.length === 0 && (
-                        <div className="p-20 rounded-[40px] bg-white/[0.01] border border-dashed border-white/10 text-center">
-                            <p className="text-gray-500 font-bold mb-2">No questions available yet.</p>
-                            <p className="text-gray-600 text-sm">We're working hard to prepare content for this module.</p>
+                        <div className="p-20 rounded-[40px] bg-[var(--card)] border border-dashed border-[var(--border-color)] text-center">
+                            <p className="text-[var(--muted-text)] font-bold mb-2">No questions in this module yet.</p>
+                            <p className="text-[var(--muted-text)] text-sm opacity-80">Content may be added later.</p>
                         </div>
                     )}
                 </div>

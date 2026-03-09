@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 
 namespace Application.Features.Auth;
 
@@ -33,7 +33,7 @@ public class AuthService(
         return ApiResult<AuthResponseDto>.Success(new AuthResponseDto(
             accessToken,
             refreshTokenValue,
-            DateTime.UtcNow.AddMinutes(60),
+            tokenService.GetAccessTokenExpirationUtc(),
             user.FullName,
             user.Role.ToString(),
             user.Email,
@@ -53,28 +53,23 @@ public class AuthService(
         if (user.Status != UserStatus.Active)
             return ApiResult<AuthResponseDto>.Failure("User account is inactive.");
 
-        string newRefreshValue = null!;
         var accessToken = tokenService.GenerateAccessToken(user.Id, user.Email, user.FullName, user.Role.ToString());
-        await unitOfWork.ExecuteInTransactionAsync(async () =>
+        tokenEntity.IsRevoked = true;
+        refreshTokenRepository.Update(tokenEntity);
+        var (newRefreshValue, newRefreshExpiration) = tokenService.GenerateRefreshToken();
+        var newRefreshEntity = new RefreshToken
         {
-            tokenEntity.IsRevoked = true;
-            refreshTokenRepository.Update(tokenEntity);
-            var (nv, newRefreshExpiration) = tokenService.GenerateRefreshToken();
-            newRefreshValue = nv;
-            var newRefreshEntity = new RefreshToken
-            {
-                Token = nv,
-                ExpirationDate = newRefreshExpiration,
-                UserId = user.Id
-            };
-            await refreshTokenRepository.AddAsync(newRefreshEntity, cancellationToken);
-            await unitOfWork.SaveChangesAsync(cancellationToken);
-        }, cancellationToken);
+            Token = newRefreshValue,
+            ExpirationDate = newRefreshExpiration,
+            UserId = user.Id
+        };
+        await refreshTokenRepository.AddAsync(newRefreshEntity, cancellationToken);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return ApiResult<AuthResponseDto>.Success(new AuthResponseDto(
             accessToken,
-            newRefreshValue!,
-            DateTime.UtcNow.AddMinutes(60),
+            newRefreshValue,
+            tokenService.GetAccessTokenExpirationUtc(),
             user.FullName,
             user.Role.ToString(),
             user.Email,

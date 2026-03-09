@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 
 namespace Application.Features.Users;
 

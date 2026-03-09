@@ -2,24 +2,22 @@ import type { Metadata } from "next";
 import "@fontsource-variable/plus-jakarta-sans";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
+import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
-  title: "Interviewify | Ace Your Next Interview",
-  description: "Personalized prep, real-time feedback, and data-driven insights to help you land your dream job.",
-  icons: {
-    icon: "/icon.png",
-    apple: "/icon.png",
-  },
+  title: siteConfig.fullTitle,
+  description: siteConfig.description,
+  icons: siteConfig.icons,
   openGraph: {
-    title: "Interviewify | .NET Core Interview Prep",
+    title: siteConfig.seoTitle,
     description: "Full-stack interview prep platform for .NET Core developers — categories, subcategories & curated Q&A.",
-    images: ["/images/interviewify-banner.png"],
+    images: [siteConfig.ogImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Interviewify | .NET Core Interview Prep",
+    title: siteConfig.seoTitle,
     description: "Full-stack interview prep platform for .NET Core developers.",
-    images: ["/images/interviewify-banner.png"],
+    images: [siteConfig.ogImage],
   },
 };
 
@@ -29,7 +27,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){var t=localStorage.getItem('interviewify-theme');if(t==='dark'||t==='light'){document.documentElement.classList.add(t)}else if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark')}else{document.documentElement.classList.add('light')}})();`,
+          }}
+        />
+      </head>
       <body className="antialiased">
         <Providers>
           {children}

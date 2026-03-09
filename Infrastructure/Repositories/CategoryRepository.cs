@@ -1,5 +1,5 @@
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +14,16 @@ public class CategoryRepository : ICategoryRepository
         _context = context;
     }
 
-    public async Task<IReadOnlyList<Category>> GetAllAsync(CancellationToken cancellationToken = default) =>
-        await _context.Categories
+    public async Task<IReadOnlyList<Category>> GetAllAsync(bool activeOnly = false, CancellationToken cancellationToken = default)
+    {
+        var query = _context.Categories
             .AsNoTracking()
             .Include(c => c.SubCategories)
-            .OrderBy(c => c.Name)
-            .ToListAsync(cancellationToken);
+            .AsQueryable();
+        if (activeOnly)
+            query = query.Where(c => c.IsActive);
+        return await query.OrderBy(c => c.Name).ToListAsync(cancellationToken);
+    }
 
     public async Task<Category?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>
         await _context.Categories

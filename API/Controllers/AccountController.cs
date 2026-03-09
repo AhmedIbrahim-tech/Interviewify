@@ -1,6 +1,9 @@
 using System.Security.Claims;
 using Application.Common;
+using Application.Features.Categories;
+using Application.Features.Questions;
 using Application.Features.Users;
+using Application.Interfaces;
 using API.Routes;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -11,9 +14,30 @@ namespace API.Controllers;
 [ApiController]
 [Route(ApiRoutes.Account.Controller)]
 [Authorize]
-public class AccountController(IUserService userService) : ControllerBase
+public class AccountController(
+    IUserService userService,
+    ICategoryService categoryService,
+    IQuestionService questionService,
+    ICurrentUserService currentUserService) : ControllerBase
 {
-    private int UserId => int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+    private int UserId => currentUserService.GetUserId();
+
+    [HttpGet(ApiRoutes.Account.Stats)]
+    public async Task<ActionResult<ApiResult<StatsDto>>> GetStats(CancellationToken cancellationToken)
+    {
+        var catResult = await categoryService.GetAllAsync(activeOnly: false, cancellationToken);
+        var quesResult = await questionService.GetAllAsync(cancellationToken);
+        int categoryCount = catResult.Data?.Count ?? 0;
+        int questionCount = quesResult.Data?.Count ?? 0;
+        int? userCount = null;
+        if (User.IsInRole("Admin"))
+        {
+            var userResult = await userService.GetAllAsync(cancellationToken);
+            userCount = userResult.Data?.Count ?? 0;
+        }
+        var stats = new StatsDto(categoryCount, questionCount, userCount);
+        return Ok(ApiResult<StatsDto>.Success(stats));
+    }
 
     [HttpGet(ApiRoutes.Account.Profile)]
     public async Task<ActionResult<ApiResult<UserResponseDto?>>> GetProfile(CancellationToken cancellationToken)

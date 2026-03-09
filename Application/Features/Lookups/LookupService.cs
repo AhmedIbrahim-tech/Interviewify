@@ -1,6 +1,6 @@
 using Application.Common;
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 
 namespace Application.Features.Lookups;
 
@@ -38,7 +38,7 @@ public class LookupService : ILookupService
 
     public async Task<ApiResult<IEnumerable<LookupDto>>> GetCategoriesAsync(CancellationToken cancellationToken = default)
     {
-        var categories = await _categoryRepository.GetAllAsync(cancellationToken);
+        var categories = await _categoryRepository.GetAllAsync(activeOnly: false, cancellationToken);
         var result = categories.Select(c => new LookupDto(c.Id, c.Name));
         
         return ApiResult<IEnumerable<LookupDto>>.Success(result);

@@ -1,5 +1,5 @@
-import SubCategoryManagementPage from "@/features/dashboard/pages/SubCategoryManagementPage";
+import { redirect } from "next/navigation";
 
-export default function Page() {
-    return <SubCategoryManagementPage />;
+export default function DashboardSubcategoriesPage() {
+    redirect("/dashboard/categories");
 }

@@ -1,7 +1,7 @@
 using Application.Common;
 using Application.Features.SubCategories;
 using Application.Interfaces;
-using Domian.Entities;
+using Domain.Entities;
 
 namespace Application.Features.Categories;
 
@@ -16,12 +16,13 @@ public class CategoryService : ICategoryService
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ApiResult<IReadOnlyList<CategoryResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
+    public async Task<ApiResult<IReadOnlyList<CategoryResponseDto>>> GetAllAsync(bool activeOnly = false, CancellationToken cancellationToken = default)
     {
-        var list = await _repository.GetAllAsync(cancellationToken);
+        var list = await _repository.GetAllAsync(activeOnly, cancellationToken);
         var dtos = list.Select(e => new CategoryResponseDto(
             e.Id, 
             e.Name, 
+            e.Description, 
             e.IsActive, 
             e.SubCategories.Select(s => new SubCategoryResponseDto(s.Id, s.Name, s.CategoryId)).ToList()
         )).ToList();
@@ -37,6 +38,7 @@ public class CategoryService : ICategoryService
         var dto = new CategoryResponseDto(
             e.Id, 
             e.Name, 
+            e.Description, 
             e.IsActive, 
             e.SubCategories.Select(s => new SubCategoryResponseDto(s.Id, s.Name, s.CategoryId)).ToList()
         );
@@ -45,11 +47,11 @@ public class CategoryService : ICategoryService
 
     public async Task<ApiResult<CategoryResponseDto>> CreateAsync(CreateCategoryDto dto, CancellationToken cancellationToken = default)
     {
-        var entity = new Category { Name = dto.Name, IsActive = dto.IsActive };
+        var entity = new Category { Name = dto.Name, Description = dto.Description, IsActive = dto.IsActive };
         await _repository.AddAsync(entity, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         return ApiResult<CategoryResponseDto>.Success(new CategoryResponseDto(
-            entity.Id, entity.Name, entity.IsActive, new List<SubCategoryResponseDto>()));
+            entity.Id, entity.Name, entity.Description, entity.IsActive, new List<SubCategoryResponseDto>()));
     }
 
     public async Task<ApiResult<CategoryResponseDto>> UpdateAsync(int id, UpdateCategoryDto dto, CancellationToken cancellationToken = default)
@@ -59,13 +61,14 @@ public class CategoryService : ICategoryService
             return ApiResult<CategoryResponseDto>.Failure("Category not found.");
         
         entity.Name = dto.Name;
+        entity.Description = dto.Description;
         entity.IsActive = dto.IsActive;
         
         _repository.Update(entity);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
         
         return ApiResult<CategoryResponseDto>.Success(new CategoryResponseDto(
-            entity.Id, entity.Name, entity.IsActive, 
+            entity.Id, entity.Name, entity.Description, entity.IsActive, 
             entity.SubCategories.Select(s => new SubCategoryResponseDto(s.Id, s.Name, s.CategoryId)).ToList()));
     }
 

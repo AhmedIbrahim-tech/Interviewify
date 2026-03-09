@@ -18,6 +18,15 @@ public class QuestionsController(IQuestionService service) : ControllerBase
         if (!result.IsSuccess) return BadRequest(result);
         return Ok(result);
     }
+    [HttpGet(ApiRoutes.Questions.ByCategoryId)]
+    [AllowAnonymous]
+    public async Task<ActionResult<ApiResult<IReadOnlyList<QuestionResponseDto>>>> GetByCategoryId(int categoryId, CancellationToken cancellationToken)
+    {
+        var result = await service.GetByCategoryIdAsync(categoryId, cancellationToken);
+        if (!result.IsSuccess) return BadRequest(result);
+        return Ok(result);
+    }
+
     [HttpGet(ApiRoutes.Questions.BySubCategoryId)]
     [AllowAnonymous]
     public async Task<ActionResult<ApiResult<IReadOnlyList<QuestionResponseDto>>>> GetBySubCategoryId(int subCategoryId, CancellationToken cancellationToken)

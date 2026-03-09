@@ -5,6 +5,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { store, persistor } from '@/store';
 import { setStore } from '@/config/api';
 import { ToastContainer } from 'react-toastify';
+import { ThemeProvider } from '@/components/ThemeProvider';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Inject store into API client so interceptors can read auth state (avoids circular dependency)
@@ -14,8 +15,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     return (
         <Provider store={store}>
             <PersistGate loading={null} persistor={persistor}>
-                {children}
-                <ToastContainer
+                <ThemeProvider>
+                    {children}
+                    <ToastContainer
                     position="top-right"
                     autoClose={5000}
                     hideProgressBar={false}
@@ -27,6 +29,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
                     pauseOnHover
                     theme="colored"
                 />
+                </ThemeProvider>
             </PersistGate>
         </Provider>
     );

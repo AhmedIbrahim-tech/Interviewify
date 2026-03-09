@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, AlertCircle, Clock, Info, Shield, Star } from 'lucide-react';
 
-export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'default' | 'primary' | 'premium';
+export type BadgeVariant = 'success' | 'warning' | 'danger' | 'info' | 'default' | 'primary' | 'premium' | 'secondary';
 
 interface StatusBadgeProps {
     label: string;
@@ -9,50 +9,58 @@ interface StatusBadgeProps {
     icon?: React.ElementType;
     pulse?: boolean;
     size?: 'sm' | 'md' | 'lg';
+    className?: string;
 }
 
+/* Semantic tokens so badges work in light and dark mode */
 const variantConfig: Record<BadgeVariant, { container: string, text: string, icon: React.ElementType, glow: string }> = {
     success: {
-        container: 'bg-emerald-50 border-emerald-100/50',
-        text: 'text-emerald-600',
+        container: 'bg-[var(--success-light)] border-[var(--success)]/30',
+        text: 'text-[var(--success)]',
         icon: CheckCircle2,
-        glow: 'bg-emerald-400'
+        glow: 'bg-[var(--success)]'
     },
     warning: {
-        container: 'bg-amber-50 border-amber-100/50',
-        text: 'text-amber-600',
+        container: 'bg-[var(--warning-light)] border-[var(--warning)]/30',
+        text: 'text-[var(--warning)]',
         icon: Clock,
-        glow: 'bg-amber-400'
+        glow: 'bg-[var(--warning)]'
     },
     danger: {
-        container: 'bg-rose-50 border-rose-100/50',
-        text: 'text-rose-600',
+        container: 'bg-[var(--danger-light)] border-[var(--danger)]/30',
+        text: 'text-[var(--danger)]',
         icon: AlertCircle,
-        glow: 'bg-rose-400'
+        glow: 'bg-[var(--danger)]'
     },
     info: {
-        container: 'bg-sky-50 border-sky-100/50',
-        text: 'text-sky-600',
+        container: 'bg-[var(--info-light)] border-[var(--info)]/30',
+        text: 'text-[var(--info)]',
         icon: Info,
-        glow: 'bg-sky-400'
+        glow: 'bg-[var(--info)]'
     },
     primary: {
-        container: 'bg-indigo-50 border-indigo-100/50',
-        text: 'text-indigo-600',
+        container: 'bg-[var(--primary-light)] border-[var(--primary)]/30',
+        text: 'text-[var(--primary)]',
         icon: Shield,
-        glow: 'bg-indigo-400'
+        glow: 'bg-[var(--primary)]'
     },
     premium: {
-        container: 'bg-purple-50 border-purple-100/50 shadow-[0_0_15px_rgba(168,85,247,0.15)]',
-        text: 'text-purple-600',
+        container: 'bg-[var(--primary-light)] border-[var(--primary)]/40 shadow-[0_0_15px_var(--primary)]/20',
+        text: 'text-[var(--primary)]',
         icon: Star,
-        glow: 'bg-purple-400'
+        glow: 'bg-[var(--primary)]'
     },
     default: {
-        container: 'bg-slate-50 border-slate-100/50',
-        text: 'text-slate-500',
+        container: 'bg-[var(--surface-elevated)] border-[var(--border-color)]',
+        text: 'text-[var(--text-muted)]',
         icon: Info,
-        glow: 'bg-slate-300'
+        glow: 'bg-[var(--text-muted)]'
+    },
+    secondary: {
+        container: 'bg-[var(--surface-elevated)] border-[var(--border-color)]',
+        text: 'text-[var(--text-muted)]',
+        icon: Clock,
+        glow: 'bg-[var(--text-muted)]'
     },
 };
 
@@ -67,16 +75,17 @@ export function StatusBadge({
     variant = 'default',
     icon: CustomIcon,
     pulse = false,
-    size = 'md'
+    size = 'md',
+    className = ''
 }: StatusBadgeProps) {
-    const config = variantConfig[variant];
+    const config = variantConfig[variant] ?? variantConfig.default;
     const Icon = CustomIcon || config.icon;
 
     return (
         <span className={`
             inline-flex items-center font-bold uppercase tracking-wider rounded-xl border
             transition-all duration-300 hover:scale-105 select-none
-            ${config.container} ${config.text} ${sizeStyles[size]}
+            ${config.container} ${config.text} ${sizeStyles[size]} ${className}
         `}>
             {pulse && (
                 <span className="relative flex h-2 w-2">

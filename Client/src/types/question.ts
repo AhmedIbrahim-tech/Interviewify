@@ -1,5 +1,6 @@
+/** id is number from API; route params may be string. */
 export interface Question {
-    id: string;
+    id: number | string;
     title: string;
     answer: string;
     categoryId: number;
@@ -12,7 +13,7 @@ export interface Question {
 
 export interface CreateQuestionDto {
     title: string;
-    answer: string;
+    answer?: string;
     categoryId: number;
     subCategoryId: number;
     isActive?: boolean;
@@ -20,6 +21,6 @@ export interface CreateQuestionDto {
 
 export interface UpdateQuestionDto {
     title: string;
-    answer: string;
+    answer?: string;
     isActive: boolean;
 }

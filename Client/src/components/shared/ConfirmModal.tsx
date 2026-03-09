@@ -29,11 +29,11 @@ export function ConfirmModal({
     const typeStyles = {
         danger: {
             icon: 'bg-[var(--danger-light)] text-[var(--danger)]',
-            button: 'bg-[var(--danger)] hover:bg-[#e57857] text-white shadow-md shadow-[var(--danger)]/20'
+            button: 'bg-[var(--danger)] hover:bg-[var(--danger-hover)] text-white shadow-md shadow-[var(--danger)]/20'
         },
         warning: {
             icon: 'bg-[var(--warning-light)] text-[var(--warning)]',
-            button: 'bg-[var(--warning)] hover:bg-[#e69e1b] text-white shadow-md shadow-[var(--warning)]/20'
+            button: 'bg-[var(--warning)] hover:opacity-90 text-white shadow-md shadow-[var(--warning)]/20'
         },
         info: {
             icon: 'bg-[var(--info-light)] text-[var(--info)]',
@@ -49,14 +49,14 @@ export function ConfirmModal({
             <div className="absolute inset-0 bg-[var(--primary)]/[0.03]" onClick={onClose} />
 
             {/* Modal */}
-            <div className="relative w-full max-w-[420px] bg-white rounded-2xl border border-gray-100 shadow-[0_20px_50px_-12px_rgba(0,0,0,0.1)] animate-scale-in overflow-hidden">
+            <div className="relative w-full max-w-[420px] bg-[var(--card)] rounded-2xl border border-[var(--border-color)] shadow-[var(--shadow-lg)] animate-scale-in overflow-hidden">
                 {/* Accent line */}
                 <div className={`h-1.5 w-full ${type === 'danger' ? 'bg-[var(--danger)]' : type === 'warning' ? 'bg-[var(--warning)]' : 'bg-[var(--primary)]'}`} />
 
                 {/* Close */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 rounded-xl hover:bg-gray-50 text-[var(--text-muted)] transition-all"
+                    className="absolute top-4 right-4 p-2 rounded-xl hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] transition-all"
                 >
                     <X size={18} />
                 </button>
@@ -74,7 +74,7 @@ export function ConfirmModal({
                     <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-2.5 rounded-lg border border-[var(--border-color)] text-[13px] font-medium text-[var(--text-secondary)] hover:bg-gray-50 transition-colors"
+                            className="flex-1 px-4 py-2.5 rounded-lg border border-[var(--border-color)] text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] transition-colors"
                         >
                             {cancelText}
                         </button>

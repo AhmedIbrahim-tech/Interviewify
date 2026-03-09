@@ -7,6 +7,6 @@ public class UpdateProfileValidator : AbstractValidator<UpdateProfileDto>
     public UpdateProfileValidator()
     {
         RuleFor(x => x.FullName).NotEmpty().MaximumLength(200);
-        RuleFor(x => x.Email).NotEmpty().EmailAddress();
+        RuleFor(x => x.Email).NotEmpty().EmailAddress().MaximumLength(256);
     }
 }

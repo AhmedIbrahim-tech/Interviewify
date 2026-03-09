@@ -5,12 +5,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useAppSelector, useAppDispatch } from '@/store/hooks';
-import { logout, logoutUser } from '@/store/slices/authSlice';
+import { logoutUser } from '@/store/slices/authSlice';
 import { getFileUrl } from '@/config/api';
 import {
     LayoutDashboard,
     FolderOpen,
-    GitBranch,
     FileQuestion,
     Users,
     Settings,
@@ -24,6 +23,8 @@ import {
     ChevronDown,
     User
 } from 'lucide-react';
+import { ThemeToggle } from '@/components/ThemeToggle';
+import { siteConfig } from '@/config/site';
 
 const navSections = [
     {
@@ -58,7 +59,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
     const handleSignOut = async () => {
         await dispatch(logoutUser());
-        dispatch(logout());
         router.push('/login');
     };
 
@@ -80,7 +80,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
             {/* Mobile overlay */}
             {sidebarOpen && (
                 <div
-                    className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+                    className="fixed inset-0 bg-[var(--overlay)] z-30 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
@@ -100,11 +100,11 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                             I
                         </div>
                         <span className="font-bold text-[var(--text-primary)] text-[17px] tracking-tight">
-                            Interviewify
+                            {siteConfig.name}
                         </span>
                     </Link>
                     <button
-                        className="lg:hidden p-1.5 rounded-lg hover:bg-gray-100 text-[var(--text-muted)]"
+                        className="lg:hidden p-1.5 rounded-lg hover:bg-[var(--surface-elevated)] text-[var(--text-muted)]"
                         onClick={() => setSidebarOpen(false)}
                     >
                         <X size={18} />
@@ -119,7 +119,9 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                 {section.label}
                             </p>
                             <div className="space-y-0.5">
-                                {section.items.map((item) => {
+                                {section.items
+                                    .filter((item) => (item.href === '/dashboard/users' ? user?.role === 'Admin' : true))
+                                    .map((item) => {
                                     const isActive = pathname === item.href;
                                     const Icon = item.icon;
                                     return (
@@ -131,7 +133,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                                 flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium transition-all
                                                 ${isActive
                                                     ? 'bg-[var(--primary-light)] text-[var(--primary)] font-semibold'
-                                                    : 'text-[var(--text-secondary)] hover:bg-gray-50 hover:text-[var(--text-primary)]'
+                                                    : 'text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[var(--text-primary)]'
                                                 }
                                             `}
                                         >
@@ -152,7 +154,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         <Link
                             href="/"
                             target="_blank"
-                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--text-secondary)] hover:bg-gray-50 hover:text-[var(--primary)] transition-all"
+                            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] hover:text-[var(--primary)] transition-all"
                         >
                             <ExternalLink size={18} strokeWidth={1.8} />
                             <span>View Website</span>
@@ -163,7 +165,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                 {/* User Card */}
                 <div className="p-4 border-t border-[var(--border-light)]">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-[var(--primary-light)]">
-                        <div className="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-white">
+                        <div className="relative h-10 w-10 rounded-full overflow-hidden flex-shrink-0 ring-2 ring-[var(--surface)]">
                             {avatarUrl ? (
                                 <Image
                                     src={avatarUrl}
@@ -189,7 +191,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         <button
                             onClick={handleSignOut}
                             title="Sign Out"
-                            className="p-2 rounded-lg hover:bg-white/60 text-[var(--danger)] transition-colors flex-shrink-0"
+                            className="p-2 rounded-lg hover:bg-[var(--danger-soft)] text-[var(--danger)] transition-colors flex-shrink-0"
                         >
                             <LogOut size={16} />
                         </button>
@@ -204,7 +206,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                     {/* Left: menu toggle + breadcrumb */}
                     <div className="flex items-center gap-4">
                         <button
-                            className="lg:hidden p-2 rounded-lg hover:bg-gray-100 text-[var(--text-secondary)]"
+                            className="lg:hidden p-2 rounded-lg hover:bg-[var(--surface-elevated)] text-[var(--text-secondary)]"
                             onClick={() => setSidebarOpen(true)}
                         >
                             <Menu size={20} />
@@ -233,6 +235,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
 
                     {/* Right: utilities */}
                     <div className="flex items-center gap-2">
+                        <ThemeToggle />
                         {/* Search */}
                         <div className="hidden md:flex items-center relative">
                             <Search size={16} className="absolute left-3 text-[var(--text-light)]" />
@@ -244,7 +247,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         </div>
 
                         {/* Notifications */}
-                        <button className="relative p-2.5 rounded-lg hover:bg-gray-100 text-[var(--text-secondary)] transition-colors">
+                        <button className="relative p-2.5 rounded-lg hover:bg-[var(--surface-elevated)] text-[var(--text-secondary)] transition-colors">
                             <Bell size={18} />
                             <span className="absolute top-1.5 right-1.5 h-2 w-2 bg-[var(--danger)] rounded-full"></span>
                         </button>
@@ -256,7 +259,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                         <div className="relative">
                             <button
                                 onClick={() => setProfileOpen(!profileOpen)}
-                                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-gray-50 transition-colors"
+                                className="flex items-center gap-2 p-1.5 rounded-lg hover:bg-[var(--surface-elevated)] transition-colors"
                             >
                                 <div className="h-8 w-8 rounded-full overflow-hidden flex-shrink-0">
                                     {avatarUrl ? (
@@ -274,7 +277,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                             {profileOpen && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setProfileOpen(false)} />
-                                    <div className="absolute right-0 top-full mt-2 w-[240px] bg-white rounded-xl border border-[var(--border-color)] shadow-[var(--shadow-lg)] z-20 animate-scale-in overflow-hidden">
+                                    <div className="absolute right-0 top-full mt-2 w-[240px] bg-[var(--surface-elevated)] rounded-xl border border-[var(--border-color)] shadow-[var(--shadow-lg)] z-20 animate-scale-in overflow-hidden">
                                         <div className="p-4 border-b border-[var(--border-light)]">
                                             <p className="font-semibold text-[var(--text-primary)] text-[14px]">{user?.name || 'Admin'}</p>
                                             <p className="text-[12px] text-[var(--text-muted)]">{user?.email || ''}</p>
@@ -283,7 +286,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                             <Link
                                                 href="/dashboard/settings"
                                                 onClick={() => setProfileOpen(false)}
-                                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-[var(--text-secondary)] hover:bg-gray-50 transition-colors"
+                                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] transition-colors"
                                             >
                                                 <User size={16} />
                                                 My Profile
@@ -291,7 +294,7 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
                                             <Link
                                                 href="/dashboard/settings"
                                                 onClick={() => setProfileOpen(false)}
-                                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-[var(--text-secondary)] hover:bg-gray-50 transition-colors"
+                                                className="flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-[13px] text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] transition-colors"
                                             >
                                                 <Settings size={16} />
                                                 Account Settings

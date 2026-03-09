@@ -1,14 +1,15 @@
+/** id/categoryId are number from API; route params may be string. */
 export interface SubCategory {
-    id: string;
+    id: number | string;
     name: string;
-    categoryId: string;
+    categoryId: number | string;
     categoryName?: string;
 }
 
 export interface Category {
-    id: string;
+    id: number | string;
     name: string;
     description?: string;
-    image?: string;
+    isActive?: boolean;
     subCategories: SubCategory[];
 }

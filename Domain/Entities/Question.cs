@@ -1,4 +1,4 @@
-namespace Domian.Entities;
+namespace Domain.Entities;
 
 public class Question
 {

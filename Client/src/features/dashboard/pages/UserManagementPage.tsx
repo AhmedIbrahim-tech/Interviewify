@@ -349,7 +349,7 @@ const UserManagementPage = () => {
                 </div>
                 <div className="bg-[var(--card)] border border-[var(--border-color)] rounded-2xl p-6 shadow-sm hover:border-[var(--warning)]/30 transition-all group">
                     <div className="flex items-center justify-between mb-3">
-                        <div className="p-2.5 rounded-xl bg-amber-50 text-amber-600 group-hover:scale-110 transition-transform">
+                        <div className="p-2.5 rounded-xl bg-[var(--warning-soft)] text-[var(--warning)] group-hover:scale-110 transition-transform">
                             <X size={20} />
                         </div>
                     </div>
@@ -612,14 +612,14 @@ const UserManagementPage = () => {
                                     </div>
                                 </div>
 
-                                <div className="p-6 rounded-[2.5rem] bg-indigo-50/30 border border-indigo-100/50 flex items-center justify-between">
+                                <div className="p-6 rounded-[2.5rem] bg-[var(--primary-light)]/50 border border-[var(--border-color)] flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="p-3 rounded-2xl bg-[var(--accent)] text-[var(--accent-foreground)] shadow-lg shadow-[var(--accent)]/20">
+                                        <div className="p-3 rounded-2xl bg-[var(--accent)] text-[var(--accent-foreground)] shadow-[var(--shadow-md)]">
                                             <Shield size={20} />
                                         </div>
                                         <div>
-                                            <p className="text-[14px] font-black text-indigo-900">Security Clearance</p>
-                                            <p className="text-[12px] font-bold text-indigo-600/80">{viewingUser.role === 'Admin' ? 'Universal System Access' : 'Standard Member Privileges'}</p>
+                                            <p className="text-[14px] font-black text-[var(--text-primary)]">Security Clearance</p>
+                                            <p className="text-[12px] font-bold text-[var(--text-secondary)]">{viewingUser.role === 'Admin' ? 'Universal System Access' : 'Standard Member Privileges'}</p>
                                         </div>
                                     </div>
                                 </div>

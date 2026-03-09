@@ -44,9 +44,9 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen selection:bg-[var(--primary-light)] selection:text-[var(--primary)]">
+        <div className="page-login">
             {/* Left - Branded Panel */}
-            <div className="hidden lg:flex lg:w-[45%] relative bg-[var(--background)] overflow-hidden border-r border-[var(--border-color)]">
+            <div className="page-login__panel-left">
                 {/* Visual Background Elements */}
                 <div className="absolute inset-0 z-0">
                     <div className="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-[var(--primary)]/20 rounded-full blur-[120px] animate-pulse" />
@@ -133,49 +133,44 @@ const LoginPage = () => {
             </div>
 
             {/* Right - Login Form */}
-            <div className="w-full lg:w-[55%] flex flex-col items-center justify-center px-6 lg:px-24 py-16 bg-[var(--background)] relative">
-                {/* Theme toggle - top right */}
-                <div className="absolute top-6 right-6 lg:top-8 lg:right-8">
+            <div className="page-login__panel-right">
+                <div className="page-login__theme-pos">
                     <ThemeToggle />
                 </div>
 
-                <div className="w-full max-w-[440px]">
-                    <div className="lg:hidden flex items-center gap-3 mb-12">
-                        <div className="h-10 w-10 rounded-xl bg-[var(--primary)] flex items-center justify-center font-bold text-white text-lg shadow-lg shadow-[var(--primary)]/20">
-                            I
-                        </div>
-                        <span className="font-extrabold text-[var(--primary-text)] text-[20px] tracking-tight">{siteConfig.name}</span>
+                <div className="page-login__form-wrap">
+                    <div className="page-login__mobile-logo">
+                        <div className="page-login__mobile-logo-icon">I</div>
+                        <span style={{ fontWeight: 800, color: "var(--primary-text)", fontSize: "20px", letterSpacing: "-0.025em" }}>{siteConfig.name}</span>
                     </div>
 
-                    <div className="mb-10 text-center lg:text-left">
-                        <h1 className="text-[32px] font-black text-[var(--primary-text)] tracking-tight mb-3">Welcome Back</h1>
-                        <p className="text-[15px] text-[var(--muted-text)] font-medium">
+                    <div style={{ marginBottom: "2.5rem", textAlign: "left" }} className="lg:text-left">
+                        <h1 className="page-login__heading">Welcome Back</h1>
+                        <p className="page-login__subheading">
                             Enter your credentials to access the dashboard.
                         </p>
                     </div>
 
                     <form onSubmit={handleLogin} className="space-y-6">
-                        {/* Email Field */}
                         <div className="space-y-2">
                             <label className="block text-[13px] font-black text-[var(--primary-text)] uppercase tracking-wider px-1">
                                 Email Address
                             </label>
-                            <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--primary)] transition-colors">
+                            <div className="page-login__input-wrap">
+                                <span className="page-login__input-icon">
                                     <Mail size={18} strokeWidth={2.5} />
-                                </div>
+                                </span>
                                 <input
                                     type="email"
                                     required
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full bg-[var(--input)] border border-[var(--input-border)] rounded-2xl py-4 pl-12 pr-4 text-[14px] text-[var(--primary-text)] font-semibold placeholder:text-[var(--text-muted)] focus:ring-4 focus:ring-[var(--primary-light)] focus:border-[var(--primary)] outline-none transition-all shadow-sm group-hover:border-[var(--border-color)]"
+                                    className="page-login__input"
                                     placeholder="admin@interviewify.local"
                                 />
                             </div>
                         </div>
 
-                        {/* Password Field */}
                         <div className="space-y-2">
                             <div className="flex justify-between items-center px-1">
                                 <label className="block text-[13px] font-black text-[var(--primary-text)] uppercase tracking-wider">
@@ -183,16 +178,17 @@ const LoginPage = () => {
                                 </label>
                                 <Link href="#" className="text-[12px] font-bold text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors">Forgot?</Link>
                             </div>
-                            <div className="relative group">
-                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] group-focus-within:text-[var(--primary)] transition-colors">
+                            <div className="page-login__input-wrap">
+                                <span className="page-login__input-icon">
                                     <Lock size={18} strokeWidth={2.5} />
-                                </div>
+                                </span>
                                 <input
                                     type={showPassword ? "text" : "password"}
                                     required
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full bg-[var(--input)] border border-[var(--input-border)] rounded-2xl py-4 pl-12 pr-14 text-[14px] text-[var(--primary-text)] font-semibold placeholder:text-[var(--text-muted)] focus:ring-4 focus:ring-[var(--primary-light)] focus:border-[var(--primary)] outline-none transition-all shadow-sm group-hover:border-[var(--border-color)]"
+                                    className="page-login__input"
+                                    style={{ paddingRight: "3.5rem" }}
                                     placeholder="••••••••"
                                 />
                                 <button
@@ -219,11 +215,10 @@ const LoginPage = () => {
                             </label>
                         </div>
 
-                        {/* Submit Action */}
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full group relative flex items-center justify-center gap-3 py-4 bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white rounded-2xl text-[15px] font-black transition-all shadow-xl shadow-[var(--shadow-md)] active:scale-95 disabled:opacity-70 disabled:active:scale-100"
+                            className="page-login__submit"
                         >
                             {isLoading ? (
                                 <div className="flex items-center gap-2">
@@ -255,10 +250,7 @@ const LoginPage = () => {
 
                     <div className="mt-10 flex flex-col items-center gap-3">
                         <span className="text-[11px] font-semibold text-[var(--muted-text)] uppercase tracking-widest">or</span>
-                        <Link
-                            href="/"
-                            className="group inline-flex items-center gap-3 px-6 py-3.5 rounded-2xl text-[14px] font-bold text-[var(--primary-text)] bg-[var(--surface)] border border-[var(--border-color)] hover:border-[var(--primary)]/40 hover:bg-[var(--primary-light)]/50 shadow-sm hover:shadow-md transition-all duration-200"
-                        >
+                        <Link href="/" className="page-login__back-link">
                             <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[var(--primary)]/10 text-[var(--primary)] group-hover:bg-[var(--primary)]/20 transition-colors">
                                 <Home size={18} strokeWidth={2.5} />
                             </span>

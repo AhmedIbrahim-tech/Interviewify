@@ -50,8 +50,7 @@ const DashboardHome = () => {
                 subtitle="Welcome back! Here's what's happening with your platform."
             />
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+            <div className="page-dashboard__stats">
                 <StatsCard
                     title="Total Categories"
                     value={loading ? '—' : (stats?.categoryCount ?? 0)}
@@ -72,49 +71,45 @@ const DashboardHome = () => {
                 />
             </div>
 
-            {/* Main Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] shadow-[var(--shadow-card)]">
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-[var(--border-light)]">
+            <div className="page-dashboard__main-grid">
+                <div className="page-dashboard__card page-dashboard__col-span-2">
+                    <div className="page-dashboard__card-header">
                         <div>
-                            <h3 className="text-[15px] font-semibold text-[var(--text-primary)]">Recent Categories</h3>
-                            <p className="text-[12px] text-[var(--text-muted)] mt-0.5">Latest learning paths</p>
+                            <h3 className="page-dashboard__card-title">Recent Categories</h3>
+                            <p className="page-dashboard__card-subtitle">Latest learning paths</p>
                         </div>
-                        <Link
-                            href="/dashboard/categories"
-                            className="flex items-center gap-1.5 text-[12px] font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors"
-                        >
+                        <Link href="/dashboard/categories" className="page-dashboard__card-link">
                             View All
                             <ArrowUpRight size={13} />
                         </Link>
                     </div>
-                    <div className="overflow-x-auto">
-                        <table className="w-full text-left">
+                    <div className="page-dashboard__table-wrap">
+                        <table className="page-dashboard__table">
                             <thead>
-                                <tr className="border-b border-[var(--border-light)] bg-[var(--surface-elevated)]">
-                                    <th className="px-6 py-3 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Name</th>
-                                    <th className="px-6 py-3 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Modules</th>
-                                    <th className="px-6 py-3 text-[11px] font-semibold text-[var(--text-muted)] uppercase tracking-wider">Status</th>
+                                <tr>
+                                    <th className="page-dashboard__th">Name</th>
+                                    <th className="page-dashboard__th">Modules</th>
+                                    <th className="page-dashboard__th">Status</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {loading ? (
                                     <tr>
-                                        <td colSpan={3} className="px-6 py-8 text-center text-[var(--text-muted)] text-sm">Loading…</td>
+                                        <td colSpan={3} className="page-dashboard__cell-center">Loading…</td>
                                     </tr>
                                 ) : recentCategories.length === 0 ? (
                                     <tr>
-                                        <td colSpan={3} className="px-6 py-8 text-center text-[var(--text-muted)] text-sm">No categories yet.</td>
+                                        <td colSpan={3} className="page-dashboard__cell-center">No categories yet.</td>
                                     </tr>
                                 ) : (
                                     recentCategories.map((cat) => (
-                                        <tr key={cat.id} className="border-b border-[var(--border-light)] last:border-0 hover:bg-[var(--surface-elevated)] transition-colors">
-                                            <td className="px-6 py-3.5">
-                                                <span className="text-[13px] font-semibold text-[var(--text-primary)]">{cat.name}</span>
+                                        <tr key={cat.id} className="page-dashboard__row">
+                                            <td className="page-dashboard__td">
+                                                <span className="page-dashboard__cell-name">{cat.name}</span>
                                             </td>
-                                            <td className="px-6 py-3.5 text-[13px] text-[var(--text-secondary)]">{cat.subCategories?.length ?? 0}</td>
-                                            <td className="px-6 py-3.5">
-                                                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-semibold ${cat.isActive !== false ? 'bg-[var(--success-light)] text-[var(--success)]' : 'bg-[var(--warning-light)] text-[var(--warning)]'}`}>
+                                            <td className="page-dashboard__td page-dashboard__cell-muted">{cat.subCategories?.length ?? 0}</td>
+                                            <td className="page-dashboard__td">
+                                                <span className={`page-dashboard__badge ${cat.isActive !== false ? 'page-dashboard__badge--success' : 'page-dashboard__badge--warning'}`}>
                                                     {cat.isActive !== false ? 'Active' : 'Inactive'}
                                                 </span>
                                             </td>
@@ -127,21 +122,21 @@ const DashboardHome = () => {
                 </div>
 
                 <div className="space-y-6">
-                    <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] shadow-[var(--shadow-card)] p-6">
-                        <h3 className="text-[14px] font-semibold text-[var(--text-primary)] mb-4">Quick links</h3>
-                        <ul className="space-y-3">
+                    <div className="page-dashboard__sidebar-card">
+                        <h3 className="page-dashboard__sidebar-title">Quick links</h3>
+                        <ul className="page-dashboard__quick-links">
                             <li>
-                                <Link href="/dashboard/categories" className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors">
+                                <Link href="/dashboard/categories" className="page-dashboard__quick-link">
                                     <LinkIcon size={14} /> Categories
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/dashboard/questions" className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors">
+                                <Link href="/dashboard/questions" className="page-dashboard__quick-link">
                                     <LinkIcon size={14} /> Questions
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/dashboard/users" className="flex items-center gap-2 text-[13px] text-[var(--text-secondary)] hover:text-[var(--primary)] transition-colors">
+                                <Link href="/dashboard/users" className="page-dashboard__quick-link">
                                     <LinkIcon size={14} /> Users
                                 </Link>
                             </li>

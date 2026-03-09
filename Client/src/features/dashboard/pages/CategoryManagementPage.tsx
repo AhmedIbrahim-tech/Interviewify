@@ -106,7 +106,7 @@ const CategoryManagementPage = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-5 border-t border-[var(--border-color)]/80">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-blue-50/50 text-blue-600 text-[12px] font-bold">
+                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-[var(--info-soft)] text-[var(--info)] text-[12px] font-bold">
                         <GitBranch size={14} />
                         <span>{cat.subCategories?.length ?? 0} Modules</span>
                     </div>
@@ -270,7 +270,7 @@ const CategoryManagementPage = () => {
                             </p>
                             <p className="text-[12px] text-[var(--text-muted)] font-bold uppercase tracking-widest mt-0.5">Modules</p>
                         </div>
-                        <div className="p-2.5 rounded-xl bg-emerald-50 text-emerald-600">
+                        <div className="p-2.5 rounded-xl bg-[var(--success-soft)] text-[var(--success)]">
                             <GitBranch size={20} />
                         </div>
                     </div>
@@ -360,7 +360,7 @@ const CategoryManagementPage = () => {
                                     header: 'Modules',
                                     key: 'subCategories',
                                     render: (cat: Category) => (
-                                        <span className="px-2.5 py-1 rounded-full bg-blue-50 text-blue-600 text-[11px] font-bold uppercase tracking-wider">
+                                        <span className="px-2.5 py-1 rounded-full bg-[var(--info-soft)] text-[var(--info)] text-[11px] font-bold uppercase tracking-wider">
                                             {cat.subCategories?.length ?? 0} modules
                                         </span>
                                     )

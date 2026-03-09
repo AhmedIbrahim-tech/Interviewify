@@ -2,25 +2,32 @@
 
 /* ================================
    INTERVIEWIFY DESIGN SYSTEM
-   Semantic theme – calm, premium, readable
-   One brand accent (blue-violet), soft semantics
+   Refactored theme: premium, calm, readable
+   Hierarchy: app bg → section → card → elevated
+   One brand accent (indigo/violet), soft semantics
    ================================ */
 
-/* ---------- LIGHT MODE (soft, eye-friendly – no pure white) ---------- */
+/* ---------- LIGHT MODE ---------- */
 :root {
-  /* Foundation – off-whites and soft grays to reduce glare */
-  --background: #F2F4F7;
-  --background-secondary: #E8ECF1;
-  --surface: #F8F9FB;
-  --surface-elevated: #FFFFFF;
-  --card: #F8F9FB;
-  --sidebar: #F6F7FA;
-  --navbar: #F8F9FB;
-  --input: #F8F9FB;
-  --border: #DDE2E8;
-  --border-light: #E8ECF1;
+  /* 1. App / page background */
+  --background: #F8FAFC;
+  --background-secondary: #F1F5F9;
 
-  /* Legacy aliases */
+  /* 2. Section / secondary surfaces */
+  --surface: #FFFFFF;
+  --surface-elevated: #FFFFFF;
+
+  /* 3. Card / content surfaces */
+  --card: #FFFFFF;
+  --sidebar: #FFFFFF;
+  --navbar: #FFFFFF;
+  --input: #FFFFFF;
+
+  /* 4. Borders – clear but not harsh */
+  --border: #E2E8F0;
+  --border-light: #F1F5F9;
+
+  /* Aliases for compatibility */
   --bg-body: var(--background);
   --bg-card: var(--card);
   --bg-sidebar: var(--sidebar);
@@ -28,8 +35,8 @@
   --border-color: var(--border);
   --input-border: var(--border);
 
-  /* Text – slightly softer than pure black for less eye strain */
-  --primary-text: #1E293B;
+  /* Text hierarchy */
+  --primary-text: #0F172A;
   --secondary-text: #475569;
   --muted-text: #64748B;
   --text-primary: var(--primary-text);
@@ -37,49 +44,50 @@
   --text-muted: var(--muted-text);
   --text-light: #94A3B8;
 
-  /* Brand accent */
+  /* Brand accent – one primary */
   --accent: #6366F1;
   --accent-hover: #4F46E5;
-  --accent-soft: #E8EAFA;
+  --accent-soft: #EEF2FF;
   --primary: var(--accent);
   --primary-hover: var(--accent-hover);
   --primary-light: var(--accent-soft);
   --primary-dark: #4F46E5;
 
-  /* Semantic – slightly muted for calmer light mode */
-  --success: #0D9668;
-  --success-soft: #E6F7F0;
+  /* Semantic – softer, not neon */
+  --success: #10B981;
+  --success-soft: #ECFDF5;
   --success-light: var(--success-soft);
-  --warning: #D97706;
-  --warning-soft: #FEF6E8;
+  --warning: #F59E0B;
+  --warning-soft: #FFFBEB;
   --warning-light: var(--warning-soft);
-  --danger: #DC2626;
-  --danger-soft: #FDF2F2;
+  --danger: #EF4444;
+  --danger-soft: #FEF2F2;
   --danger-light: var(--danger-soft);
-  --danger-hover: #B91C1C;
-  --info: #0284C7;
-  --info-soft: #EFF8FC;
+  --danger-hover: #DC2626;
+  --info: #0EA5E9;
+  --info-soft: #F0F9FF;
   --info-light: var(--info-soft);
 
-  /* On-accent text (buttons, badges) */
+  /* On-accent (buttons, badges) */
   --accent-foreground: #FFFFFF;
 
-  /* Modal/overlay backdrop (not pure black) */
-  --overlay: rgb(0 0 0 / 0.28);
+  /* Overlay – not pure black */
+  --overlay: rgb(15 23 42 / 0.35);
 
-  /* Focus & shadows – very soft to avoid harsh edges */
+  /* Focus */
   --focus-ring: var(--accent);
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.03);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.04), 0 2px 4px -2px rgb(0 0 0 / 0.03);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.04);
-  --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.03);
+
+  /* Shadows – subtle depth */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.05), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.04);
   --shadow: var(--shadow-md);
 
-  /* Hover / active (reference) */
   --hover-overlay: rgb(0 0 0 / 0.03);
   --active-overlay: rgb(0 0 0 / 0.05);
+  --surface-overlay: rgb(0 0 0 / 0.06);
 
-  /* Radius */
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
@@ -89,15 +97,21 @@
 
 /* ---------- DARK MODE (layered navy, no pure black) ---------- */
 .dark {
-  /* Foundation */
+  /* 1. App / page background */
   --background: #0B1120;
   --background-secondary: #111827;
+
+  /* 2. Section / secondary surfaces */
   --surface: #0F172A;
   --surface-elevated: #162033;
+
+  /* 3. Card / content surfaces */
   --card: #111C2E;
   --sidebar: #0B1220;
   --navbar: #0E1728;
   --input: #111C2E;
+
+  /* 4. Borders */
   --border: #22314A;
   --border-light: #1E293B;
 
@@ -141,23 +155,32 @@
   --info-soft: #132A3A;
   --info-light: var(--info-soft);
 
-  /* On-accent text */
   --accent-foreground: #FFFFFF;
 
-  /* Modal/overlay backdrop (layered, not pure black) */
-  --overlay: rgb(0 0 0 / 0.5);
+  /* Overlay – layered, not harsh */
+  --overlay: rgb(0 0 0 / 0.42);
 
-  /* Focus & shadows (soft, dark) */
   --focus-ring: var(--accent);
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.25);
-  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.3), 0 2px 6px -2px rgb(0 0 0 / 0.2);
-  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.35), 0 4px 8px -4px rgb(0 0 0 / 0.25);
-  --shadow-card: 0 4px 16px 0 rgb(0 0 0 / 0.3);
+
+  /* Shadows – soft depth on dark */
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.2);
+  --shadow-md: 0 4px 12px -2px rgb(0 0 0 / 0.25), 0 2px 6px -2px rgb(0 0 0 / 0.18);
+  --shadow-lg: 0 12px 24px -4px rgb(0 0 0 / 0.3), 0 4px 8px -4px rgb(0 0 0 / 0.2);
+  --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.25);
   --shadow: var(--shadow-md);
 
   --hover-overlay: rgb(255 255 255 / 0.04);
   --active-overlay: rgb(255 255 255 / 0.06);
+  --surface-overlay: rgb(255 255 255 / 0.06);
 }
+
+/*
+  Theme hierarchy (use in order for clear depth):
+  1. --background / --background-secondary  → page / app background
+  2. --surface                             → section / panel background
+  3. --card, --sidebar, --navbar, --input  → content surfaces
+  4. --surface-elevated                    → modals, dropdowns, active states
+*/
 
 @theme inline {
   /* Semantic colors for Tailwind (bg-background, text-foreground, etc.) */
@@ -233,14 +256,15 @@ body {
   border-radius: var(--radius-full);
 }
 
-/* Selection */
+/* Selection – calm, not harsh */
 ::selection {
-  background: var(--accent);
-  color: var(--accent-foreground);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .dark ::selection {
-  color: var(--background);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 /* Focus ring */
@@ -325,3 +349,6 @@ body {
 .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
 .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+
+/* أنماط الصفحات (منفصلة عن JSX) */
+@import "./styles/pages.css";

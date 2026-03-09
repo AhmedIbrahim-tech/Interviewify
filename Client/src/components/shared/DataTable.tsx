@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo } from "react";
 import {
     ChevronDown,
     ChevronLeft,
@@ -7,10 +7,9 @@ import {
     Trash2,
     Eye,
     ArrowUpDown,
-    MoreVertical,
-    ChevronUp
-} from 'lucide-react';
-import { CustomSelect } from './CustomSelect';
+    ChevronUp,
+} from "lucide-react";
+import { CustomSelect } from "./CustomSelect";
 
 export interface Column<T> {
     header: string;
@@ -42,7 +41,7 @@ export function DataTable<T extends { id: string | number }>({
     actions = true,
     renderExpanded,
     pageSize = 10,
-    selectable = true
+    selectable = true,
 }: DataTableProps<T>) {
     const [expandedRows, setExpandedRows] = useState<Set<string | number>>(new Set());
     const [currentPage, setCurrentPage] = useState(1);
@@ -58,36 +57,37 @@ export function DataTable<T extends { id: string | number }>({
     }, [data.length]);
 
     const toggleRow = (id: string | number) => {
-        const newExpanded = new Set(expandedRows);
-        if (newExpanded.has(id)) newExpanded.delete(id);
-        else newExpanded.add(id);
-        setExpandedRows(newExpanded);
+        const next = new Set(expandedRows);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        setExpandedRows(next);
     };
 
     const toggleSelectAll = () => {
         if (selectedRows.size === pagedData.length) {
             setSelectedRows(new Set());
         } else {
-            setSelectedRows(new Set(pagedData.map(i => i.id)));
+            setSelectedRows(new Set(pagedData.map((i) => i.id)));
         }
     };
 
     const toggleSelectRow = (id: string | number) => {
-        const newSelected = new Set(selectedRows);
-        if (newSelected.has(id)) newSelected.delete(id);
-        else newSelected.add(id);
-        setSelectedRows(newSelected);
+        const next = new Set(selectedRows);
+        if (next.has(id)) next.delete(id);
+        else next.add(id);
+        setSelectedRows(next);
     };
 
     if (loading) {
         return (
-            <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-color)] shadow-sm overflow-hidden animate-pulse">
-                <div className="h-12 bg-[var(--surface-elevated)] border-b border-[var(--border-color)]" />
-                {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="px-6 py-5 border-b border-[var(--border-light)] last:border-0 flex gap-4">
-                        <div className="h-4 bg-[var(--surface-elevated)] rounded w-1/4" />
-                        <div className="h-4 bg-[var(--surface-elevated)] rounded w-1/4" />
-                        <div className="h-4 bg-[var(--surface-elevated)] rounded w-1/4 ml-auto" />
+            <div className="data-table__loading">
+                <div className="data-table__loading-header" />
+                {[1, 2, 3, 4, 5, 6].map((i) => (
+                    <div key={i} className="data-table__loading-row">
+                        <div className="data-table__loading-cell" />
+                        <div className="data-table__loading-cell" />
+                        <div className="data-table__loading-cell" />
+                        <div className="data-table__loading-cell" style={{ maxWidth: "12%" }} />
                     </div>
                 ))}
             </div>
@@ -95,86 +95,99 @@ export function DataTable<T extends { id: string | number }>({
     }
 
     return (
-        <div className="bg-[var(--bg-card)] rounded-2xl border border-[var(--border-color)] shadow-sm relative">
-            <div className="overflow-x-auto rounded-t-2xl overflow-hidden">
-                <table className="w-full text-left">
-                    <thead>
-                        <tr className="border-b border-[var(--border-color)] bg-[var(--surface-elevated)]">
+        <div className="data-table">
+            <div className="data-table__scroll">
+                <table className="data-table__table">
+                    <thead className="data-table__thead">
+                        <tr>
                             {selectable && (
-                                <th className="px-5 py-4 w-10">
+                                <th className="data-table__th data-table__th--checkbox">
                                     <input
                                         type="checkbox"
-                                        className="h-4 w-4 rounded border-[var(--input-border)] text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
+                                        className="data-table__checkbox"
                                         checked={selectedRows.size > 0 && selectedRows.size === pagedData.length}
                                         onChange={toggleSelectAll}
+                                        aria-label="Select all"
                                     />
                                 </th>
                             )}
-                            {columns.map((column, idx) => (
-                                <th key={idx} className="px-5 py-4 text-[13px] font-bold text-[var(--text-primary)] whitespace-nowrap">
-                                    <div className="flex items-center gap-1.5 cursor-pointer hover:text-[var(--primary)] transition-colors group">
-                                        {column.header}
-                                        {column.sortable !== false && (
-                                            <ArrowUpDown size={14} className="text-[var(--text-light)] group-hover:text-[var(--primary)] opacity-50 transition-colors" />
+                            {columns.map((col, idx) => (
+                                <th key={idx} className="data-table__th">
+                                    <span className="data-table__th-sort">
+                                        {col.header}
+                                        {col.sortable !== false && (
+                                            <ArrowUpDown size={14} style={{ opacity: 0.6 }} aria-hidden />
                                         )}
-                                    </div>
+                                    </span>
                                 </th>
                             ))}
                             {actions && (
-                                <th className="px-5 py-4 text-[13px] font-bold text-[var(--text-primary)] text-right whitespace-nowrap uppercase tracking-wider">
-                                    Actions
-                                </th>
+                                <th className="data-table__th data-table__th--actions">Actions</th>
                             )}
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody className="data-table__tbody">
                         {pagedData.map((item, idx) => {
                             const isExpanded = expandedRows.has(item.id);
                             const isSelected = selectedRows.has(item.id);
+                            const rowNum = startIdx + idx + 1;
 
                             return (
                                 <React.Fragment key={item.id}>
-                                    <tr className={`
-                                        border-b border-[var(--border-light)] last:border-0
-                                        transition-all duration-200
-                                        ${isSelected ? 'bg-[var(--primary-light)]/50' : 'hover:bg-[var(--surface-elevated)]'}
-                                        ${isExpanded ? 'bg-[var(--surface-elevated)] shadow-inner' : ''}
-                                    `}>
+                                    <tr
+                                        className={`data-table__tr ${isSelected ? "data-table__tr--selected" : ""} ${isExpanded ? "data-table__tr--expanded" : ""}`}
+                                    >
                                         {selectable && (
-                                            <td className="px-5 py-4">
+                                            <td className="data-table__td data-table__td--checkbox">
                                                 <input
                                                     type="checkbox"
-                                                    className="h-4 w-4 rounded border-[var(--input-border)] text-[var(--primary)] focus:ring-[var(--primary)] cursor-pointer"
+                                                    className="data-table__checkbox"
                                                     checked={selectedRows.has(item.id)}
                                                     onChange={() => toggleSelectRow(item.id)}
+                                                    aria-label={`Select row ${rowNum}`}
                                                 />
                                             </td>
                                         )}
-                                        {columns.map((column, colIdx) => (
-                                            <td key={colIdx} className="px-5 py-4 text-[14px] text-[var(--text-secondary)] font-medium">
-                                                {column.render ? column.render(item, idx) : (item[column.key as keyof T] as React.ReactNode)}
+                                        {columns.map((col, colIdx) => (
+                                            <td key={colIdx} className="data-table__td">
+                                                {col.render
+                                                    ? col.render(item, idx)
+                                                    : (item[col.key as keyof T] as React.ReactNode)}
                                             </td>
                                         ))}
                                         {actions && (
-                                            <td className="px-5 py-4">
-                                                <div className="flex justify-end items-center gap-1">
+                                            <td className="data-table__td">
+                                                <div className="data-table__actions">
                                                     {renderExpanded && (
                                                         <button
+                                                            type="button"
                                                             onClick={() => toggleRow(item.id)}
-                                                            className={`p-1.5 rounded-lg hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] transition-all ${isExpanded ? 'text-[var(--primary)] bg-[var(--primary-light)]' : ''}`}
+                                                            className={`data-table__expand-btn ${isExpanded ? "data-table__expand-btn--active" : ""}`}
+                                                            title={isExpanded ? "Collapse" : "Expand"}
+                                                            aria-expanded={isExpanded}
                                                         >
-                                                            {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                                                            {isExpanded ? (
+                                                                <ChevronUp size={16} />
+                                                            ) : (
+                                                                <ChevronDown size={16} />
+                                                            )}
                                                         </button>
                                                     )}
                                                     {onView && (
-                                                        <button onClick={() => onView(item)} className="p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--primary-light)] hover:text-[var(--primary)] transition-colors">
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onView(item)}
+                                                            className="data-table__action-btn data-table__action-btn--view"
+                                                            title="View"
+                                                        >
                                                             <Eye size={16} />
                                                         </button>
                                                     )}
                                                     {onEdit && (
                                                         <button
+                                                            type="button"
                                                             onClick={() => onEdit(item)}
-                                                            className="p-2 rounded-lg text-[var(--warning)] hover:bg-[var(--warning-light)] transition-colors"
+                                                            className="data-table__action-btn data-table__action-btn--edit"
                                                             title="Edit"
                                                         >
                                                             <Pencil size={16} />
@@ -182,8 +195,9 @@ export function DataTable<T extends { id: string | number }>({
                                                     )}
                                                     {onDelete && (
                                                         <button
+                                                            type="button"
                                                             onClick={() => onDelete(item.id)}
-                                                            className="p-2 rounded-lg text-[var(--danger)] hover:bg-[var(--danger-light)] transition-colors"
+                                                            className="data-table__action-btn data-table__action-btn--delete"
                                                             title="Delete"
                                                         >
                                                             <Trash2 size={16} />
@@ -194,9 +208,14 @@ export function DataTable<T extends { id: string | number }>({
                                         )}
                                     </tr>
                                     {isExpanded && renderExpanded && (
-                                        <tr className="bg-[var(--surface-elevated)]">
-                                            <td colSpan={columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)} className="px-12 py-6 border-b border-[var(--border-light)]">
-                                                <div className="animate-fade-in bg-[var(--card)] p-4 rounded-xl border border-[var(--border-color)]">
+                                        <tr className="data-table__expanded-row">
+                                            <td
+                                                colSpan={
+                                                    columns.length + (selectable ? 1 : 0) + (actions ? 1 : 0)
+                                                }
+                                                className="data-table__expanded-cell"
+                                            >
+                                                <div className="data-table__expanded-inner">
                                                     {renderExpanded(item)}
                                                 </div>
                                             </td>
@@ -209,44 +228,45 @@ export function DataTable<T extends { id: string | number }>({
                 </table>
             </div>
 
-            {/* Pagination Footer */}
             {data.length > 0 && (
-                <div className="flex flex-col sm:flex-row items-center justify-between px-6 py-4 border-t border-[var(--border-color)] bg-[var(--surface-elevated)] gap-4 rounded-b-2xl">
+                <div className="data-table__pagination">
                     <div className="flex items-center gap-2">
-                        <p className="text-[13px] text-[var(--text-muted)] font-medium whitespace-nowrap">
-                            Rows per page:
-                        </p>
+                        <span className="data-table__pagination-label">Rows per page:</span>
                         <div className="w-24">
                             <CustomSelect
                                 options={[
-                                    { value: 10, label: '10' },
-                                    { value: 25, label: '25' },
-                                    { value: 50, label: '50' }
+                                    { value: 10, label: "10" },
+                                    { value: 25, label: "25" },
+                                    { value: 50, label: "50" },
                                 ]}
                                 value={pageSize}
-                                onChange={() => { }} // Could be implemented later if pageSize becomes state
-                                placeholder={pageSize.toString()}
+                                onChange={() => {}}
+                                placeholder={String(pageSize)}
                                 direction="top"
                                 className="scale-90"
                             />
                         </div>
                     </div>
                     <div className="flex items-center gap-6">
-                        <span className="text-[13px] text-[var(--text-muted)] font-medium">
+                        <span className="data-table__pagination-range">
                             {startIdx + 1}-{Math.min(endIdx, data.length)} of {data.length}
                         </span>
-                        <div className="flex items-center gap-2">
+                        <div className="data-table__pagination-nav">
                             <button
+                                type="button"
                                 disabled={currentPage === 1}
-                                onClick={() => setCurrentPage(p => p - 1)}
-                                className="p-2 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface)] hover:shadow-sm border border-transparent hover:border-[var(--border-color)] transition-all disabled:opacity-30"
+                                onClick={() => setCurrentPage((p) => p - 1)}
+                                className="data-table__pagination-btn"
+                                aria-label="Previous page"
                             >
                                 <ChevronLeft size={18} />
                             </button>
                             <button
+                                type="button"
                                 disabled={currentPage === totalPages || totalPages === 0}
-                                onClick={() => setCurrentPage(p => p + 1)}
-                                className="p-2 rounded-xl text-[var(--text-muted)] hover:bg-[var(--surface)] hover:shadow-sm border border-transparent hover:border-[var(--border-color)] transition-all disabled:opacity-30"
+                                onClick={() => setCurrentPage((p) => p + 1)}
+                                className="data-table__pagination-btn"
+                                aria-label="Next page"
                             >
                                 <ChevronRight size={18} />
                             </button>

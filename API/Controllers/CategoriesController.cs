@@ -47,6 +47,15 @@ public class CategoriesController(ICategoryService service) : ControllerBase
         return Ok(result);
     }
 
+    [HttpPatch(ApiRoutes.Categories.ToggleStatus)]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> ToggleStatus(int id, CancellationToken cancellationToken)
+    {
+        var result = await service.ToggleStatusAsync(id, cancellationToken);
+        if (!result.IsSuccess) return BadRequest(result);
+        return Ok(result);
+    }
+
     [HttpDelete(ApiRoutes.Categories.Id)]
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Delete(int id, CancellationToken cancellationToken)

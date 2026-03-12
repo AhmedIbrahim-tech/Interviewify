@@ -14,6 +14,7 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(e => e.Name).HasMaxLength(200).IsRequired();
         builder.Property(e => e.Description).HasMaxLength(2000);
         builder.Property(e => e.IsActive).IsRequired().HasDefaultValue(true);
+        builder.Property(e => e.DisplayOrder).IsRequired().HasDefaultValue(0);
         builder.HasMany(e => e.SubCategories).WithOne(e => e.Category).HasForeignKey(e => e.CategoryId).OnDelete(DeleteBehavior.Restrict);
     }
 }

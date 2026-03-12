@@ -9,6 +9,7 @@ public static class ApiRoutes
         public const string Controller = Base + "/categories";
         public const string GetAll = "";
         public const string Id = "{id:int}";
+        public const string ToggleStatus = "{id:int}/toggle-status";
     }
 
     public static class SubCategories
@@ -24,6 +25,7 @@ public static class ApiRoutes
         public const string ByCategoryId = "by-category/{categoryId:int}";
         public const string BySubCategoryId = "by-subcategory/{subCategoryId:int}";
         public const string Id = "{id:int}";
+        public const string ToggleStatus = "{id:int}/toggle-status";
     }
 
     public static class Auth

@@ -93,6 +93,13 @@
   --radius-lg: 14px;
   --radius-xl: 20px;
   --radius-full: 9999px;
+
+  /* Code blocks – clearly distinct from prose (light) */
+  --code-bg: #F1F5F9;
+  --code-border: #E2E8F0;
+  --code-label-bg: #E2E8F0;
+  --code-text: #0F172A;
+  --code-inline-bg: #E2E8F0;
 }
 
 /* ---------- DARK MODE (layered navy, no pure black) ---------- */
@@ -172,6 +179,13 @@
   --hover-overlay: rgb(255 255 255 / 0.04);
   --active-overlay: rgb(255 255 255 / 0.06);
   --surface-overlay: rgb(255 255 255 / 0.06);
+
+  /* Code blocks – clearly distinct from prose (dark) */
+  --code-bg: #162033;
+  --code-border: #22314A;
+  --code-label-bg: #1E293B;
+  --code-text: #E2E8F0;
+  --code-inline-bg: #1E293B;
 }
 
 /*
@@ -349,6 +363,53 @@ body {
 .stagger-children > *:nth-child(4) { animation-delay: 150ms; }
 .stagger-children > *:nth-child(5) { animation-delay: 200ms; }
 .stagger-children > *:nth-child(6) { animation-delay: 250ms; }
+
+/* ========== Notifications (Sonner) – aligned with design system ========== */
+[data-sonner-toaster] {
+  --width: 360px;
+  --border-radius: var(--radius-md, 10px);
+  font-family: var(--font-sans, inherit);
+}
+[data-sonner-toaster][data-theme="light"] {
+  --normal-bg: var(--card);
+  --normal-border: var(--border-color);
+  --normal-text: var(--primary-text);
+  --success-bg: var(--success-soft);
+  --success-border: color-mix(in srgb, var(--success) 40%, transparent);
+  --success-text: var(--success);
+  --error-bg: var(--danger-soft);
+  --error-border: color-mix(in srgb, var(--danger) 40%, transparent);
+  --error-text: var(--danger);
+  --warning-bg: var(--warning-soft);
+  --warning-border: color-mix(in srgb, var(--warning) 40%, transparent);
+  --warning-text: var(--warning);
+  --info-bg: var(--info-soft);
+  --info-border: color-mix(in srgb, var(--info) 40%, transparent);
+  --info-text: var(--info);
+}
+[data-sonner-toaster][data-theme="dark"] {
+  --normal-bg: var(--card);
+  --normal-border: var(--border-color);
+  --normal-text: var(--primary-text);
+  --success-bg: var(--success-soft);
+  --success-border: color-mix(in srgb, var(--success) 35%, transparent);
+  --success-text: var(--success);
+  --error-bg: var(--danger-soft);
+  --error-border: color-mix(in srgb, var(--danger) 35%, transparent);
+  --error-text: var(--danger);
+  --warning-bg: var(--warning-soft);
+  --warning-border: color-mix(in srgb, var(--warning) 35%, transparent);
+  --warning-text: var(--warning);
+  --info-bg: var(--info-soft);
+  --info-border: color-mix(in srgb, var(--info) 35%, transparent);
+  --info-text: var(--info);
+}
+[data-sonner-toast] {
+  box-shadow: var(--shadow-lg) !important;
+  font-size: 13px !important;
+  font-weight: 500;
+  padding: 14px 16px !important;
+}
 
 /* أنماط الصفحات (منفصلة عن JSX) */
 @import "./styles/pages.css";

@@ -31,7 +31,7 @@ import { useAppSelector, useAppDispatch } from '@/store/hooks';
 import { fetchUsers, addUser, editUser, removeUser, toggleUserStatus } from '@/store/slices/userSlice';
 import { fetchRoles } from '@/store/slices/lookupSlice';
 import { User } from '@/types/user';
-import { toast } from 'react-toastify';
+import { notify } from '@/lib/notify';
 import { uploadService } from '@/services/uploadService';
 import { getFileUrl } from '@/config/api';
 import Image from 'next/image';
@@ -182,7 +182,7 @@ const UserManagementPage = () => {
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            toast.error("File size exceeds 2MB");
+            notify.error("File size exceeds 2MB");
             return;
         }
 
@@ -196,13 +196,13 @@ const UserManagementPage = () => {
                         id: userId,
                         data: { ...formData, profilePicture: imageUrl }
                     }));
-                    toast.success("Image uploaded");
+                    notify.success("Image uploaded");
                     dispatch(fetchUsers());
                 } else {
-                    toast.error(response.message || "Upload failed");
+                    notify.error(response.message || "Upload failed");
                 }
             } catch (err) {
-                toast.error("Upload failed");
+                notify.error("Upload failed");
             } finally {
                 setUploading(false);
             }
@@ -268,12 +268,12 @@ const UserManagementPage = () => {
 
             if (addUser.fulfilled.match(resultAction) || editUser.fulfilled.match(resultAction)) {
                 setIsModalOpen(false);
-                toast.success(`User ${editingUser ? 'updated' : 'created'} successfully`);
+                notify.success(`User ${editingUser ? 'updated' : 'created'} successfully`);
             } else {
-                toast.error(resultAction.payload as string || "Operation failed");
+                notify.error(resultAction.payload as string || "Operation failed");
             }
         } catch (err) {
-            toast.error("Operation failed");
+            notify.error("Operation failed");
         }
     };
 
@@ -282,12 +282,12 @@ const UserManagementPage = () => {
             setConfirmState({ open: false, id: null });
             const resultAction = await dispatch(removeUser(id));
             if (removeUser.fulfilled.match(resultAction)) {
-                toast.success("User removed successfully");
+                notify.success("User removed successfully");
             } else {
-                toast.error(resultAction.payload as string || "Delete failed");
+                notify.error(resultAction.payload as string || "Delete failed");
             }
         } catch (err) {
-            toast.error("Operation failed");
+            notify.error("Operation failed");
         }
     };
 

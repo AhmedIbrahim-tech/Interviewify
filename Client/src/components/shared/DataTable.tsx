@@ -8,6 +8,8 @@ import {
     Eye,
     ArrowUpDown,
     ChevronUp,
+    ExternalLink,
+    ToggleLeft,
 } from "lucide-react";
 import { CustomSelect } from "./CustomSelect";
 
@@ -18,6 +20,8 @@ export interface Column<T> {
     render?: (item: T, index: number) => React.ReactNode;
 }
 
+export type SortDirection = "asc" | "desc";
+
 interface DataTableProps<T> {
     data: T[];
     columns: Column<T>[];
@@ -25,10 +29,16 @@ interface DataTableProps<T> {
     onEdit?: (item: T) => void;
     onDelete?: (id: string | number) => void;
     onView?: (item: T) => void;
+    onToggleStatus?: (item: T) => void;
+    onOpenInBank?: (item: T) => void;
     actions?: boolean;
     renderExpanded?: (item: T) => React.ReactNode;
     pageSize?: number;
+    onPageSizeChange?: (size: number) => void;
     selectable?: boolean;
+    sortKey?: string;
+    sortDirection?: SortDirection;
+    onSort?: (key: string, direction: SortDirection) => void;
 }
 
 export function DataTable<T extends { id: string | number }>({
@@ -38,14 +48,23 @@ export function DataTable<T extends { id: string | number }>({
     onEdit,
     onDelete,
     onView,
+    onToggleStatus,
+    onOpenInBank,
     actions = true,
     renderExpanded,
-    pageSize = 10,
+    pageSize: initialPageSize = 10,
+    onPageSizeChange,
     selectable = true,
+    sortKey,
+    sortDirection,
+    onSort,
 }: DataTableProps<T>) {
     const [expandedRows, setExpandedRows] = useState<Set<string | number>>(new Set());
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedRows, setSelectedRows] = useState<Set<string | number>>(new Set());
+    const [internalPageSize, setInternalPageSize] = useState(initialPageSize);
+    const pageSize = onPageSizeChange ? initialPageSize : internalPageSize;
+    const setPageSize = onPageSizeChange ?? setInternalPageSize;
 
     const totalPages = Math.ceil(data.length / pageSize);
     const startIdx = (currentPage - 1) * pageSize;
@@ -55,6 +74,18 @@ export function DataTable<T extends { id: string | number }>({
     React.useEffect(() => {
         setCurrentPage(1);
     }, [data.length]);
+
+    const handlePageSizeChange = (value: number) => {
+        setPageSize(value);
+        setCurrentPage(1);
+        onPageSizeChange?.(value);
+    };
+
+    const handleSort = (key: string) => {
+        if (!onSort || columns.find((c) => (c.key as string) === key)?.sortable === false) return;
+        const next = sortKey === key && sortDirection === "desc" ? "asc" : "desc";
+        onSort(key, next);
+    };
 
     const toggleRow = (id: string | number) => {
         const next = new Set(expandedRows);
@@ -111,16 +142,30 @@ export function DataTable<T extends { id: string | number }>({
                                     />
                                 </th>
                             )}
-                            {columns.map((col, idx) => (
-                                <th key={idx} className="data-table__th">
-                                    <span className="data-table__th-sort">
-                                        {col.header}
-                                        {col.sortable !== false && (
-                                            <ArrowUpDown size={14} style={{ opacity: 0.6 }} aria-hidden />
-                                        )}
-                                    </span>
-                                </th>
-                            ))}
+                            {columns.map((col, idx) => {
+                                const key = col.key as string;
+                                const isSorted = sortKey === key;
+                                return (
+                                    <th key={idx} className="data-table__th">
+                                        <span
+                                            className="data-table__th-sort"
+                                            role={col.sortable !== false && onSort ? "button" : undefined}
+                                            onClick={col.sortable !== false && onSort ? () => handleSort(key) : undefined}
+                                            onKeyDown={col.sortable !== false && onSort ? (e) => e.key === "Enter" && handleSort(key) : undefined}
+                                            tabIndex={col.sortable !== false && onSort ? 0 : undefined}
+                                        >
+                                            {col.header}
+                                            {col.sortable !== false && (
+                                                isSorted ? (
+                                                    sortDirection === "desc" ? <ChevronDown size={14} aria-hidden /> : <ChevronUp size={14} aria-hidden />
+                                                ) : (
+                                                    <ArrowUpDown size={14} style={{ opacity: 0.6 }} aria-hidden />
+                                                )
+                                            )}
+                                        </span>
+                                    </th>
+                                );
+                            })}
                             {actions && (
                                 <th className="data-table__th data-table__th--actions">Actions</th>
                             )}
@@ -183,6 +228,27 @@ export function DataTable<T extends { id: string | number }>({
                                                             <Eye size={16} />
                                                         </button>
                                                     )}
+                                                    {onOpenInBank && (
+                                                        <a
+                                                            href={`/question/${item.id}`}
+                                                            target="_blank"
+                                                            rel="noopener noreferrer"
+                                                            className="data-table__action-btn data-table__action-btn--view"
+                                                            title="Open in question bank"
+                                                        >
+                                                            <ExternalLink size={16} />
+                                                        </a>
+                                                    )}
+                                                    {onToggleStatus && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => onToggleStatus(item)}
+                                                            className="data-table__action-btn data-table__action-btn--edit"
+                                                            title="Toggle status"
+                                                        >
+                                                            <ToggleLeft size={16} />
+                                                        </button>
+                                                    )}
                                                     {onEdit && (
                                                         <button
                                                             type="button"
@@ -240,7 +306,7 @@ export function DataTable<T extends { id: string | number }>({
                                     { value: 50, label: "50" },
                                 ]}
                                 value={pageSize}
-                                onChange={() => {}}
+                                onChange={(val) => handlePageSizeChange(Number(val))}
                                 placeholder={String(pageSize)}
                                 direction="top"
                                 className="scale-90"

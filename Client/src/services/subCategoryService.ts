@@ -18,12 +18,12 @@ export const subCategoryService = {
         return response.data;
     },
 
-    createSubCategory: async (data: { name: string; categoryId: number }): Promise<ApiResponse<SubCategory>> => {
+    createSubCategory: async (data: { name: string; categoryId: number; displayOrder?: number }): Promise<ApiResponse<SubCategory>> => {
         const response = await api.post<ApiResponse<SubCategory>>('/subcategories', data);
         return response.data;
     },
 
-    updateSubCategory: async (id: number, data: { name: string }): Promise<ApiResponse<SubCategory>> => {
+    updateSubCategory: async (id: number, data: { name: string; displayOrder?: number }): Promise<ApiResponse<SubCategory>> => {
         const response = await api.put<ApiResponse<SubCategory>>(`/subcategories/${id}`, data);
         return response.data;
     },

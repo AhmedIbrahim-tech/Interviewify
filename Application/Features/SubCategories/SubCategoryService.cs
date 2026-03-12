@@ -18,14 +18,14 @@ public class SubCategoryService : ISubCategoryService
     public async Task<ApiResult<IReadOnlyList<SubCategoryResponseDto>>> GetAllAsync(CancellationToken cancellationToken = default)
     {
         var list = await _repository.GetAllAsync(cancellationToken);
-        var dtos = list.Select(e => new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.Category?.Name)).ToList();
+        var dtos = list.Select(e => new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.DisplayOrder, e.Category?.Name)).ToList();
         return ApiResult<IReadOnlyList<SubCategoryResponseDto>>.Success(dtos);
     }
 
     public async Task<ApiResult<IReadOnlyList<SubCategoryResponseDto>>> GetByCategoryIdAsync(int categoryId, CancellationToken cancellationToken = default)
     {
         var list = await _repository.GetByCategoryIdAsync(categoryId, cancellationToken);
-        var dtos = list.Select(e => new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.Category?.Name)).ToList();
+        var dtos = list.Select(e => new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.DisplayOrder, e.Category?.Name)).ToList();
         return ApiResult<IReadOnlyList<SubCategoryResponseDto>>.Success(dtos);
     }
 
@@ -33,15 +33,15 @@ public class SubCategoryService : ISubCategoryService
     {
         var e = await _repository.GetByIdAsync(id, cancellationToken);
         if (e == null) return ApiResult<SubCategoryResponseDto>.Failure("SubCategory not found.");
-        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.Category?.Name));
+        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(e.Id, e.Name, e.CategoryId, e.DisplayOrder, e.Category?.Name));
     }
 
     public async Task<ApiResult<SubCategoryResponseDto>> CreateAsync(CreateSubCategoryDto dto, CancellationToken cancellationToken = default)
     {
-        var entity = new SubCategory { Name = dto.Name, CategoryId = dto.CategoryId };
+        var entity = new SubCategory { Name = dto.Name, CategoryId = dto.CategoryId, DisplayOrder = dto.DisplayOrder };
         await _repository.AddAsync(entity, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(entity.Id, entity.Name, entity.CategoryId));
+        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(entity.Id, entity.Name, entity.CategoryId, entity.DisplayOrder));
     }
 
     public async Task<ApiResult<SubCategoryResponseDto>> UpdateAsync(int id, UpdateSubCategoryDto dto, CancellationToken cancellationToken = default)
@@ -50,9 +50,10 @@ public class SubCategoryService : ISubCategoryService
         if (entity == null)
             return ApiResult<SubCategoryResponseDto>.Failure("SubCategory not found.");
         entity.Name = dto.Name;
+        entity.DisplayOrder = dto.DisplayOrder;
         _repository.Update(entity);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
-        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(entity.Id, entity.Name, entity.CategoryId));
+        return ApiResult<SubCategoryResponseDto>.Success(new SubCategoryResponseDto(entity.Id, entity.Name, entity.CategoryId, entity.DisplayOrder));
     }
 
     public async Task<ApiResult<bool>> DeleteAsync(int id, CancellationToken cancellationToken = default)

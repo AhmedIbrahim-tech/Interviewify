@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { accountService, UpdateProfileDto } from "@/services/accountService";
 import { uploadService } from "@/services/uploadService";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/notify";
 import { useAppSelector } from "@/store/hooks";
 import { getFileUrl } from "@/config/api";
 import Image from "next/image";
@@ -59,7 +59,7 @@ const SettingsPage = () => {
                     });
                 }
             } catch (err) {
-                toast.error("Failed to load profile");
+                notify.error("Failed to load profile");
             }
         };
 
@@ -88,7 +88,7 @@ const SettingsPage = () => {
         try {
             const response = await accountService.updateProfile(profileData);
             if (response.isSuccess) {
-                toast.success("Profile updated successfully");
+                notify.success("Profile updated successfully");
                 if (response.data) {
                     dispatch(
                         updateCredentials({
@@ -105,10 +105,10 @@ const SettingsPage = () => {
                     );
                 }
             } else {
-                toast.error(response.message || "Update failed");
+                notify.error(response.message || "Update failed");
             }
         } catch (err) {
-            toast.error("Operation failed");
+            notify.error("Operation failed");
         } finally {
             setLoading(false);
         }
@@ -119,7 +119,7 @@ const SettingsPage = () => {
         if (!file) return;
 
         if (file.size > 2 * 1024 * 1024) {
-            toast.error("File size exceeds 2MB");
+            notify.error("File size exceeds 2MB");
             return;
         }
 
@@ -134,7 +134,7 @@ const SettingsPage = () => {
                 });
 
                 if (updateRes.isSuccess) {
-                    toast.success("Image updated successfully");
+                    notify.success("Image updated successfully");
                     setProfileData((prev) => ({ ...prev, profilePicture: imageUrl }));
 
                     if (user) {
@@ -147,13 +147,13 @@ const SettingsPage = () => {
                         );
                     }
                 } else {
-                    toast.error(updateRes.message || "Failed to update profile");
+                    notify.error(updateRes.message || "Failed to update profile");
                 }
             } else {
-                toast.error(response.message || "Upload failed");
+                notify.error(response.message || "Upload failed");
             }
         } catch (err) {
-            toast.error("Upload failed");
+            notify.error("Upload failed");
         } finally {
             setLoading(false);
         }

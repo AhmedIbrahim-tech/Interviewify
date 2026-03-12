@@ -12,3 +12,11 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     pageSize: number;
     count: number;
 }
+
+export interface PagedResult<T> {
+    items: T[];
+    totalCount: number;
+    pageIndex: number;
+    pageSize: number;
+    totalPages?: number;
+}

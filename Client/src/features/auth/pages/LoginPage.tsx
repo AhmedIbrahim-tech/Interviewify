@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { loginUser } from '@/store/slices/authSlice';
-import { toast } from 'react-toastify';
+import { notify } from '@/lib/notify';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, ArrowRight, Sparkles, Code2, Users2, CheckCircle2, FolderOpen, Terminal, ShieldCheck, Home } from 'lucide-react';
 import { siteConfig } from '@/config/site';
@@ -34,10 +34,10 @@ const LoginPage = () => {
         setIsLoading(true);
         try {
             await dispatch(loginUser({ email, password })).unwrap();
-            toast.success("Login successful!");
+            notify.success("Login successful!");
             router.push('/dashboard');
         } catch (err: any) {
-            toast.error(err || "Invalid credentials");
+            notify.error(err || "Invalid credentials");
         } finally {
             setIsLoading(false);
         }

@@ -3,6 +3,7 @@ export interface SubCategory {
     id: number | string;
     name: string;
     categoryId: number | string;
+    displayOrder?: number;
     categoryName?: string;
 }
 
@@ -11,5 +12,6 @@ export interface Category {
     name: string;
     description?: string;
     isActive?: boolean;
+    displayOrder?: number;
     subCategories: SubCategory[];
 }

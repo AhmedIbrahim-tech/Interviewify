@@ -56,7 +56,7 @@ export function ConfirmModal({
                 {/* Close */}
                 <button
                     onClick={onClose}
-                    className="absolute top-4 right-4 p-2 rounded-xl hover:bg-[var(--surface-elevated)] text-[var(--text-muted)] transition-all"
+                    className="absolute top-4 right-4 p-2 rounded-xl text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-all"
                 >
                     <X size={18} />
                 </button>
@@ -74,7 +74,7 @@ export function ConfirmModal({
                     <div className="flex gap-3">
                         <button
                             onClick={onClose}
-                            className="flex-1 px-4 py-2.5 rounded-lg border border-[var(--border-color)] text-[13px] font-medium text-[var(--text-secondary)] hover:bg-[var(--surface-elevated)] transition-colors"
+                            className="flex-1 px-4 py-2.5 rounded-lg border border-[var(--danger)] text-[13px] font-medium text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-colors"
                         >
                             {cancelText}
                         </button>

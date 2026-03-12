@@ -1,6 +1,7 @@
 using Application.Common;
 using Application.Features.Questions;
 using API.Routes;
+using Domain.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,9 +13,13 @@ public class QuestionsController(IQuestionService service) : ControllerBase
 {
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<ApiResult<IReadOnlyList<QuestionResponseDto>>>> GetAll(CancellationToken cancellationToken)
+    public async Task<IActionResult> GetAll([FromBody] QuestionListFilter? filter, CancellationToken cancellationToken = default)
     {
-        var result = await service.GetAllAsync(cancellationToken);
+        var f = filter ?? new QuestionListFilter();
+        var page = f.Page < 1 ? 1 : f.Page;
+        var pageSize = f.PageSize is < 1 or > 100 ? 20 : f.PageSize;
+        var filterApplied = f with { Page = page, PageSize = pageSize, SortBy = f.SortBy ?? "CreatedAt" };
+        var result = await service.GetPagedAsync(filterApplied, cancellationToken);
         if (!result.IsSuccess) return BadRequest(result);
         return Ok(result);
     }
@@ -60,6 +65,15 @@ public class QuestionsController(IQuestionService service) : ControllerBase
     public async Task<ActionResult<ApiResult<QuestionResponseDto>>> Update(int id, [FromBody] UpdateQuestionDto dto, CancellationToken cancellationToken)
     {
         var result = await service.UpdateAsync(id, dto, cancellationToken);
+        if (!result.IsSuccess) return BadRequest(result);
+        return Ok(result);
+    }
+
+    [HttpPatch(ApiRoutes.Questions.ToggleStatus)]
+    [Authorize(Roles = "Admin")]
+    public async Task<ActionResult<ApiResult<QuestionResponseDto>>> ToggleStatus(int id, CancellationToken cancellationToken)
+    {
+        var result = await service.ToggleStatusAsync(id, cancellationToken);
         if (!result.IsSuccess) return BadRequest(result);
         return Ok(result);
     }

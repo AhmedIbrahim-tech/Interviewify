@@ -14,12 +14,16 @@ const initialState: QuestionState = {
     error: null,
 };
 
+/** Fetches first page of questions (up to 500). Backend returns paged list; we store items for dashboard. */
 export const fetchQuestions = createAsyncThunk(
     'questions/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const response = await questionService.getAllQuestions();
-            if (response.isSuccess) return response.data;
+            const response = await questionService.getQuestionsPaged({ page: 1, pageSize: 500 });
+            if (response.isSuccess && response.data?.items) {
+                const items = response.data.items.map((li) => ({ ...li, answer: '', answerAr: null })) as Question[];
+                return items;
+            }
             return rejectWithValue(response.message);
         } catch (error: any) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch questions');
@@ -66,6 +70,19 @@ export const removeQuestion = createAsyncThunk(
     }
 );
 
+export const toggleQuestionStatus = createAsyncThunk(
+    'questions/toggleStatus',
+    async (id: number, { rejectWithValue }) => {
+        try {
+            const response = await questionService.toggleStatus(id);
+            if (response.isSuccess && response.data) return response.data;
+            return rejectWithValue(response.message);
+        } catch (error: any) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to toggle status');
+        }
+    }
+);
+
 const questionSlice = createSlice({
     name: 'questions',
     initialState,
@@ -97,6 +114,10 @@ const questionSlice = createSlice({
             })
             .addCase(removeQuestion.fulfilled, (state, action: PayloadAction<number>) => {
                 state.items = state.items.filter(i => Number(i.id) !== action.payload);
+            })
+            .addCase(toggleQuestionStatus.fulfilled, (state, action: PayloadAction<Question>) => {
+                const index = state.items.findIndex(i => i.id === action.payload.id);
+                if (index !== -1) state.items[index] = action.payload;
             });
     }
 });

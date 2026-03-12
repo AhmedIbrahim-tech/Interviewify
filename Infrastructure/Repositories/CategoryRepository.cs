@@ -22,7 +22,7 @@ public class CategoryRepository : ICategoryRepository
             .AsQueryable();
         if (activeOnly)
             query = query.Where(c => c.IsActive);
-        return await query.OrderBy(c => c.Name).ToListAsync(cancellationToken);
+        return await query.OrderBy(c => c.DisplayOrder).ThenBy(c => c.Name).ToListAsync(cancellationToken);
     }
 
     public async Task<Category?> GetByIdAsync(int id, CancellationToken cancellationToken = default) =>

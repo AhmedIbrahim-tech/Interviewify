@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { categoryService } from "@/services/categoryService";
 import { Category, SubCategory } from "@/types/category";
-import { toast } from "react-toastify";
+import { notify } from "@/lib/notify";
 import Image from "next/image";
 import { getCategoryImage } from "@/utils/imageHelpers";
 import { questionService } from "@/services/questionService";
@@ -30,11 +30,11 @@ const CategoryDetailsPage = () => {
         if (catRes.isSuccess) setCategory(catRes.data);
         if (quesRes.isSuccess) setQuestions(quesRes.data);
         if (!catRes.isSuccess) {
-          toast.error(catRes.message);
+          notify.error(catRes.message);
           router.push("/");
         }
       } catch {
-        toast.error("Failed to load category experience");
+        notify.error("Failed to load category experience");
         router.push("/");
       } finally {
         setLoading(false);
@@ -47,7 +47,7 @@ const CategoryDetailsPage = () => {
     if (questions.length > 0) {
       router.push(`/question/${questions[0].id}`);
     } else {
-      toast.info("Questions are being prepared for this category.");
+      notify.info("Questions are being prepared for this category.");
     }
   };
 
@@ -162,7 +162,9 @@ const CategoryDetailsPage = () => {
                     </div>
                     <div className="page-category__question-meta">
                       <span className="page-category__question-tag">{q.subCategoryName}</span>
-                      <h3 className="page-category__question-heading">{q.title}</h3>
+                      <h3 className="page-category__question-heading" dir={q.titleAr?.trim() ? "rtl" : "ltr"}>
+                        {q.titleAr?.trim() ? q.titleAr : q.title}
+                      </h3>
                     </div>
                   </div>
                   <div className="page-category__question-right">

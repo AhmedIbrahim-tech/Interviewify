@@ -135,6 +135,15 @@ export default function Home() {
               </div>
             </div>
           </div>
+          <div className="page-home__browse-level">
+            <h2 className="page-home__filter-label page-home__filter-label-muted">Browse by level</h2>
+            <div className="page-home__level-links">
+              <Link href="/questions?level=0" className="page-home__level-link">Fresh</Link>
+              <Link href="/questions?level=1" className="page-home__level-link">Junior</Link>
+              <Link href="/questions?level=2" className="page-home__level-link">Mid-Level</Link>
+              <Link href="/questions?level=3" className="page-home__level-link">Senior</Link>
+            </div>
+          </div>
         </div>
 
         <div className="page-home__sections">

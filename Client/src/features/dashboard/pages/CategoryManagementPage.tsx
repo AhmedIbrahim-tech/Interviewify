@@ -25,7 +25,7 @@ import {
     editCategory,
     removeCategory
 } from '@/store/slices/categorySlice';
-import { toast } from 'react-toastify';
+import { notify } from '@/lib/notify';
 import { fetchSubCategories, addSubCategory, editSubCategory, removeSubCategory } from '@/store/slices/subCategorySlice';
 import { fetchCategories as fetchCategoriesLookup } from '@/store/slices/lookupSlice';
 import { Category, SubCategory } from '@/types/category';
@@ -144,12 +144,12 @@ const CategoryManagementPage = () => {
             }
 
             if (removeCategory.fulfilled.match(resultAction) || removeSubCategory.fulfilled.match(resultAction)) {
-                toast.success(`${type === 'category' ? 'Category' : 'Module'} deleted successfully`);
+                notify.success(`${type === 'category' ? 'Category' : 'Module'} deleted successfully`);
             } else {
-                toast.error(resultAction.payload as string || "Delete failed");
+                notify.error(resultAction.payload as string || "Delete failed");
             }
         } catch (err) {
-            toast.error("An unexpected error occurred");
+            notify.error("An unexpected error occurred");
         }
     };
 
@@ -179,21 +179,26 @@ const CategoryManagementPage = () => {
         e.preventDefault();
         try {
             let resultAction;
-            const payload = { name: formData.name, description: formData.description || null, isActive: formData.isActive };
+            const payload = {
+                name: formData.name,
+                description: formData.description || null,
+                isActive: formData.isActive,
+                displayOrder: editingCategory?.displayOrder ?? 0
+            };
             if (editingCategory) {
-                resultAction = await dispatch(editCategory({ id: Number(editingCategory.id), data: payload }));
+                resultAction = await dispatch(editCategory({ id: Number(editingCategory.id), data: { ...payload, displayOrder: payload.displayOrder } }));
             } else {
                 resultAction = await dispatch(addCategory(payload));
             }
 
             if (addCategory.fulfilled.match(resultAction) || editCategory.fulfilled.match(resultAction)) {
-                toast.success(`Category ${editingCategory ? 'updated' : 'created'} successfully`);
+                notify.success(`Category ${editingCategory ? 'updated' : 'created'} successfully`);
                 setIsModalOpen(false);
             } else {
-                toast.error(resultAction.payload as string || "Operation failed");
+                notify.error(resultAction.payload as string || "Operation failed");
             }
         } catch (err) {
-            toast.error("Operation failed");
+            notify.error("Operation failed");
         }
     };
 
@@ -204,23 +209,24 @@ const CategoryManagementPage = () => {
             if (editingSubCategory) {
                 resultAction = await dispatch(editSubCategory({
                     id: Number(editingSubCategory.id),
-                    data: { name: subFormData.name }
+                    data: { name: subFormData.name, displayOrder: editingSubCategory?.displayOrder ?? 0 }
                 }));
             } else {
                 resultAction = await dispatch(addSubCategory({
                     name: subFormData.name,
-                    categoryId: parseInt(subFormData.categoryId)
+                    categoryId: parseInt(subFormData.categoryId),
+                    displayOrder: 0
                 }));
             }
 
             if (addSubCategory.fulfilled.match(resultAction) || editSubCategory.fulfilled.match(resultAction)) {
-                toast.success(`Sub category ${editingSubCategory ? 'updated' : 'created'} successfully`);
+                notify.success(`Sub category ${editingSubCategory ? 'updated' : 'created'} successfully`);
                 setIsSubModalOpen(false);
             } else {
-                toast.error(resultAction.payload as string || "Operation failed");
+                notify.error(resultAction.payload as string || "Operation failed");
             }
         } catch (err) {
-            toast.error("Operation failed");
+            notify.error("Operation failed");
         }
     };
 
@@ -629,7 +635,7 @@ const CategoryManagementPage = () => {
                             <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)] to-[var(--primary-hover)] opacity-90" />
                             <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[var(--card)] to-transparent" />
 
-                            <button onClick={() => setViewingCategory(null)} className="absolute top-6 right-6 p-3 rounded-2xl bg-[var(--surface)]/80 hover:bg-[var(--surface)] text-[var(--primary-text)] transition-all backdrop-blur-md z-10">
+                            <button onClick={() => setViewingCategory(null)} className="absolute top-6 right-6 p-3 rounded-2xl text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-all z-10">
                                 <X size={20} />
                             </button>
                         </div>
@@ -682,7 +688,7 @@ const CategoryManagementPage = () => {
                                     <div className="flex justify-end pt-4">
                                         <button
                                             onClick={() => setViewingCategory(null)}
-                                            className="px-8 py-3.5 rounded-2xl bg-[var(--primary)] text-white text-[14px] font-bold hover:bg-[var(--primary-hover)] transition-all active:scale-95 shadow-[var(--shadow-md)]"
+                                            className="px-8 py-3.5 rounded-2xl bg-[var(--danger)] text-white text-[14px] font-bold hover:bg-[var(--danger-hover)] transition-all active:scale-95 shadow-[var(--shadow-md)]"
                                         >
                                             Close
                                         </button>
@@ -699,7 +705,7 @@ const CategoryManagementPage = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
                     <div className="absolute inset-0 bg-[var(--overlay)] backdrop-blur-md" onClick={() => setViewingSubCategory(null)} />
                     <div className="relative w-full max-w-[500px] bg-[var(--card)] rounded-2xl shadow-[var(--shadow-lg)] p-8 animate-scale-in border border-[var(--border-color)]">
-                        <button onClick={() => setViewingSubCategory(null)} className="absolute top-4 right-4 p-2 rounded-lg text-[var(--text-muted)] hover:bg-[var(--surface-elevated)] transition-all">
+                        <button onClick={() => setViewingSubCategory(null)} className="absolute top-4 right-4 p-2 rounded-lg text-[var(--danger)] hover:bg-[var(--danger-soft)] transition-all">
                             <X size={20} />
                         </button>
                         <div className="flex items-center gap-4 mb-6">
@@ -713,7 +719,7 @@ const CategoryManagementPage = () => {
                         </div>
                         <button
                             onClick={() => setViewingSubCategory(null)}
-                            className="w-full py-3 rounded-xl bg-[var(--primary)] hover:bg-[var(--primary-hover)] text-white text-[14px] font-semibold transition-all"
+                            className="w-full py-3 rounded-xl bg-[var(--danger)] hover:bg-[var(--danger-hover)] text-white text-[14px] font-semibold transition-all"
                         >
                             Close
                         </button>

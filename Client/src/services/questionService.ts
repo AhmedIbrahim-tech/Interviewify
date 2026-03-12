@@ -1,10 +1,38 @@
 import api from '@/config/api';
-import { Question, CreateQuestionDto, UpdateQuestionDto } from '@/types/question';
-import { ApiResponse } from '@/types/api';
+import { Question, QuestionListItem, CreateQuestionDto, UpdateQuestionDto } from '@/types/question';
+import { ApiResponse, PagedResult } from '@/types/api';
+
+export interface QuestionsPagedParams {
+    categoryId?: number;
+    subCategoryId?: number;
+    level?: number; // QuestionLevel enum value
+    isActive?: boolean;
+    page?: number;
+    pageSize?: number;
+    sortBy?: string;
+    sortDescending?: boolean;
+}
 
 export const questionService = {
-    getAllQuestions: async (): Promise<ApiResponse<Question[]>> => {
-        const response = await api.get<ApiResponse<Question[]>>('/questions');
+    getQuestionsPaged: async (params: QuestionsPagedParams): Promise<ApiResponse<PagedResult<QuestionListItem>>> => {
+        const body = {
+            categoryId: params.categoryId ?? null,
+            subCategoryId: params.subCategoryId ?? null,
+            level: params.level ?? null,
+            isActive: params.isActive ?? null,
+            page: params.page ?? 1,
+            pageSize: params.pageSize ?? 20,
+            sortBy: params.sortBy ?? 'CreatedAt',
+            sortDescending: params.sortDescending ?? true
+        };
+        const response = await api.get<ApiResponse<PagedResult<QuestionListItem>>>('/questions', { params: body });
+        return response.data;
+    },
+
+    getAllQuestions: async (): Promise<ApiResponse<PagedResult<QuestionListItem>>> => {
+        const response = await api.get<ApiResponse<PagedResult<QuestionListItem>>>('/questions', {
+            params: { page: 1, pageSize: 500, sortBy: 'CreatedAt', sortDescending: true }
+        });
         return response.data;
     },
 
@@ -35,6 +63,11 @@ export const questionService = {
 
     deleteQuestion: async (id: number): Promise<ApiResponse<void>> => {
         const response = await api.delete<ApiResponse<void>>(`/questions/${id}`);
+        return response.data;
+    },
+
+    toggleStatus: async (id: number): Promise<ApiResponse<Question>> => {
+        const response = await api.patch<ApiResponse<Question>>(`/questions/${id}/toggle-status`);
         return response.data;
     }
 };

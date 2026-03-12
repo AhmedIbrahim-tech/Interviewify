@@ -29,7 +29,7 @@ export const fetchSubCategories = createAsyncThunk(
 
 export const addSubCategory = createAsyncThunk(
     'subCategories/add',
-    async (data: { name: string; categoryId: number }, { rejectWithValue }) => {
+    async (data: { name: string; categoryId: number; displayOrder?: number }, { rejectWithValue }) => {
         try {
             const response = await subCategoryService.createSubCategory(data);
             if (response.isSuccess) return response.data;
@@ -42,7 +42,7 @@ export const addSubCategory = createAsyncThunk(
 
 export const editSubCategory = createAsyncThunk(
     'subCategories/edit',
-    async ({ id, data }: { id: number; data: { name: string } }, { rejectWithValue }) => {
+    async ({ id, data }: { id: number; data: { name: string; displayOrder?: number } }, { rejectWithValue }) => {
         try {
             const response = await subCategoryService.updateSubCategory(id, data);
             if (response.isSuccess) return response.data;
